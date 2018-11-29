@@ -1,0 +1,41 @@
+module()
+
+import 'class'
+import 'resources'
+import 'vec2'
+import 'vec4'
+
+Sprite = class()
+function Sprite:Load(path)
+    return Sprite(Resources:LoadTexture(path))
+end
+
+function Sprite:new(texture)
+    self.texture = texture
+    self.clips = {}
+end
+
+function Sprite:add(rect, pivot, border)
+    local clip = {
+        texture = self.texture,
+        rect = rect,
+        pivot = pivot or vec2(0.5, 0.5),
+        border = border or vec4(0, 0, 0, 0),
+        quad = love.graphics.newQuad(rect.x, rect.y, rect.w, rect.h, self.texture:getDimensions())
+    }
+    table.insert(self.clips, clip)
+    return clip
+end
+
+function Sprite:get(index)
+    return self.clips[index]
+end
+
+function Sprite:clear()
+    self.clips = {}
+end
+
+local love_graphics_draw = love.graphics.draw
+function Sprite:draw(x, y)
+    love_graphics_draw(self.texture, self.quad, x - self.rect.w * self.pivot.x, y - self.rect.h * self.pivot.y)
+end
