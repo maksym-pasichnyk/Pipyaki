@@ -1,5 +1,3 @@
-module()
-
 import 'class'
 
 BufferStream = class()
@@ -8,16 +6,16 @@ function BufferStream:new(data)
     self.index = 1
 end
 
-function BufferStream:readByte()
+function BufferStream:i8()
     return self:read(1):byte(1, -1)
 end
 
-function BufferStream:readShort()
+function BufferStream:i16()
     local b1, b2 = self:read(2):byte(1, -1)
     return b1 * 256 + b2
 end
 
-function BufferStream:readInt()
+function BufferStream:i32()
     local b1, b2, b3, b4 = self:read(4):byte(1, -1)
     return ((b1 * 256 + b2) * 256 + b3) * 256 + b4
 end

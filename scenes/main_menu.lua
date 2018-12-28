@@ -1,8 +1,6 @@
-module()
-
 import 'class'
 import 'scene'
-import 'scene_manager'
+import 'scene-manager'
 import 'input'
 
 import 'ui/element'
@@ -48,21 +46,21 @@ function MainMenu:new()
     local x = cx - w / 2
     local y = cy - (4 * (h + space) - space) / 2
 
-    self:add(Label('Main Menu', 0, 0, love.graphics.getWidth(), 40))
+    self:add(Label(nil, 'Main Menu', 0, 0, love.graphics.getWidth(), 40))
 
     for i, entry in ipairs(menu) do
-        local button = self:add(TextButton(entry.text, x, y, w, h))
+        local button = self:add(TextButton(nil, entry.text, x, y, w, h))
         button.onClick:add(entry.action)
         y = y + h + space
     end
 
-    local label = self:add(Label('Hello', cx - 100, 140, 200, 30))
-    local username = self:add(TextField('Username', '', cx - 100, 20, 200, 40))
-    local volume = self:add(Slider(cx - 100, 120, 200))
+    local label = self:add(Label(nil, 'Hello', cx - 100, 140, 200, 30))
+    local username = self:add(TextField(nil, 'Username', '', cx - 100, 20, 200, 40))
+    local volume = self:add(Slider(nil, cx - 100, 120, 200))
     volume.onChange:add(function (this)
         label.text = tostring(this.value)
     end)
-    local music = self:add(Checkbox(10, 200))
+    local music = self:add(Checkbox(nil, 10, 200))
     music.onToggle:add(function (this)
         volume.enabled = this.value
     end)
@@ -89,7 +87,9 @@ function MainMenu:new()
     -- end
 end
 
-function MainMenu:keypressed(key, scancode, isrepeat)
+function MainMenu:OnKeyDown(key, scancode)
+    Scene.OnKeyDown(self, key, scancode)
+    
     if key == 'escape' then
         love.event.quit()
     end

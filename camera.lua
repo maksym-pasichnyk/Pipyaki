@@ -127,7 +127,7 @@ function camera:detach()
 	love.graphics.setScissor(self._sx,self._sy,self._sw,self._sh)
 end
 
-function camera:draw(...)
+function camera:render(...)
 	local x,y,w,h,noclip,func
 	local nargs = select("#", ...)
 	if nargs == 1 then
@@ -137,7 +137,7 @@ function camera:draw(...)
 	elseif nargs == 6 then
 		x,y,w,h,noclip,func = ...
 	else
-		error("Invalid arguments to camera:draw()")
+		error("Invalid arguments to camera:render()")
 	end
 
 	self:attach(x,y,w,h,noclip)

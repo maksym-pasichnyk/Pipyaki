@@ -1,25 +1,23 @@
-module()
-
 import 'class'
 import 'ui/button'
 import 'event'
-import 'scene_manager'
+import 'scene-manager'
 
 Checkbox = class(Button)
-function Checkbox:new(x, y)
-    Button.new(self, x, y, 30, 30)
+function Checkbox:new(parent, x, y)
+    Button.new(self, parent, x, y, 30, 30)
 
     self.value = false
     self.onToggle = Event()
 end
 
-function Checkbox:OnDraw()
+function Checkbox:paintEvent()
     love.graphics.setColor(self:get_background_color())
-    love.graphics.rectangle('line', self.rect.x, self.rect.y, self.rect.w, self.rect.h, 4, 4)  
+    love.graphics.rectangle('line', 0, 0, self.w, self.h, 4, 4)  
 
     if self.value then
         love.graphics.setColor(self:get_thumb_color())
-        love.graphics.rectangle('fill', self.rect.x + 5, self.rect.y + 5, 20, 20, 4, 4)        
+        love.graphics.rectangle('fill', 5, 5, 20, 20, 4, 4)        
     end
 end
 

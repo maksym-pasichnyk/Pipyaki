@@ -1,13 +1,17 @@
-module()
-
 import 'class'
-import 'event_manager'
+import 'event-manager'
 
 Input = class()
-Input.events = EventManager()
+InputEvent = EventManager()
 Input.mouse = {}
 Input.keys = {}
 Input.queue = {}
+
+MOUSE_PRESSED  = 0
+MOUSE_RELEASED = 1
+KEY_PRESSED    = 2
+KEY_RELEASED   = 3
+TEXT_INPUT     = 4
 
 function Input:GetButtonDown(key, isrepeat)
     local info = self.keys[key]
@@ -86,7 +90,7 @@ function Input:update()
 end
 
 function Input:mousepressed(x, y, button, istouch)
-    self.events:invoke('mousepressed', x, y, button, istouch)
+    InputEvent:invoke(MOUSE_PRESSED, x, y, button, istouch)
 
     table.insert(self.queue, {
         type = 0,
@@ -98,7 +102,7 @@ function Input:mousepressed(x, y, button, istouch)
 end
 
 function Input:mousereleased(x, y, button, istouch, presses)
-    self.events:invoke('mousereleased', x, y, button, istouch)
+    InputEvent:invoke(MOUSE_RELEASED, x, y, button, istouch)
 
     table.insert(self.queue, {
         type = 1,
@@ -111,7 +115,7 @@ function Input:mousereleased(x, y, button, istouch, presses)
 end
 
 function Input:keypressed(key, scancode, isrepeat)
-    self.events:invoke('keypressed', key, scancode, isrepeat)
+    InputEvent:invoke(KEY_PRESSED, key, scancode, isrepeat)
 
     table.insert(self.queue, {
         type = 2,
@@ -122,7 +126,7 @@ function Input:keypressed(key, scancode, isrepeat)
 end
 
 function Input:keyreleased(key)
-    self.events:invoke('keyreleased', key)
+    InputEvent:invoke(KEY_RELEASED, key)
 
     table.insert(self.queue, {
         type = 3,
@@ -131,13 +135,5 @@ function Input:keyreleased(key)
 end
 
 function Input:textinput(text)
-    self.events:invoke('textinput', text)
-end
-
-function Input:bind(action, callback)
-    self.events:bind(action, callback)
-end
-
-function Input:unbind(action, callback)
-    self.events:unbind(action, callback)
+    InputEvent:invoke(TEXT_INPUT, text)
 end

@@ -1,0 +1,6 @@
+[GameInfo]
+no
+[end]
+[Countries]
+Russia;170;1;tpp ;tpp ;8355;3533;90.00 без НДС;9.00 без НДС;150;0000003514
+[end]

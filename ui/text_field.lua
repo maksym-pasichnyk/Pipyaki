@@ -1,5 +1,3 @@
-module()
-
 import 'class'
 import 'ui/button'
 import 'ui/label'
@@ -11,16 +9,17 @@ local DefaultStyle = require 'ui/default_style'
 local Style = DefaultStyle.text_field
 
 TextField = class(Label)
-function TextField:new(text, hint, x, y, w, h)
-    Label.new(self, text, x, y, w, h, 'left')
+function TextField:new(parent, text, hint, x, y, w, h)
+    Label.new(self, parent, text, x, y, w, h, 'left')
 
+    self.clip = true
     self.hint = hint
     self.onEdit = Event()
 end
 
-function TextField:OnDraw()
-    Button.OnDraw(self)
-    Label.OnDraw(self)
+function TextField:paintEvent()
+    Button.paintEvent(self)
+    Label.paintEvent(self)
 end
 
 function TextField:get_background_color()

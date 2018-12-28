@@ -1,67 +1,51 @@
-module()
-
 import 'class'
 import 'list'
+import 'rect'
 import 'ui/element'
 
-UIContainer = class()
-function UIContainer:new()
-    self.elements = List()
+GraphicsScene = class()
+function GraphicsScene:new()
+    self.childs = List()
 end
 
-function UIContainer:OnValidate()
-    self.elements:foreach(function(element)
-        element:OnValidate()
-    end)
-end
-
-function UIContainer:hit(x, y)
-    for i = self.elements:size(), 1, -1 do
-        local element = self.elements:get(i)
-        local obj = element:hit(x, y)
-
+function GraphicsScene:itemAt(x, y)
+    for i = self.childs:size(), 1, -1 do
+        local obj = self.childs:get(i):itemAt(x, y)
+        
         if obj then
             return obj
         end
     end
 end
 
-function UIContainer:add(element)
-    assert(rawequal(element.parent, nil))
-
-    element.parent = self
-    element.isDirty = true
-
-    self.elements:add(element)
-
-    return element
+function GraphicsScene:add(child)
+    -- assert(child:is(GraphicsItem) and rawequal(child.scene, nil))
+    child.scene = self
+    self.childs:add(child)
+    return child
 end
 
-function UIContainer:localToGlobal(x, y)
-    return x, y
+function GraphicsScene:remove(child)
+    -- assert(child:is(GraphicsItem) and rawequal(child.scene, self))
+    child.scene = nil
+    self.childs:remove(child)
 end
 
-function UIContainer:globalToLocal(x, y)
-    return x, y
-end
+local getScreenWidth = love.graphics.getWidth
+local getScreenHeight = love.graphics.getHeight
 
-function UIContainer:remove(element)
-    assert(element:is(UIElement) and rawequal(element.parent, self))
-
-    element.parent = nil
-    element.isDirty = true
-
-    self.elements:remove(element)
-end
-
-function UIContainer:draw()
-    self.elements:foreach(function(element)
-        element:draw()
+function GraphicsScene:render()
+    local boundingRect = Rect(0, 0, getScreenWidth(), getScreenHeight())
+    
+    self.childs:foreach(function(child)
+        if boundingRect:intersect(child:boundingRect()) then
+            child:render()
+        end
     end)
 end
 
-function UIContainer:update(dt)
-    self.elements:foreach(function(element)
-        element:update(dt)
+function GraphicsScene:update(dt)
+    self.childs:foreach(function(child)
+        child:update(dt)
     end)
 end

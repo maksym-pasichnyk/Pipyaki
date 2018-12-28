@@ -1,7 +1,5 @@
-module()
-
 import 'class'
-import 'tile_sprite'
+import 'tile-sprite'
 
 TileGrass = class(TileSprite)
 function TileGrass:new(type, x, y)

@@ -1,10 +1,8 @@
-module()
-
 import 'class'
 import 'entity'
 import 'input'
 
-local function Animation(idle, index, frames, speed)
+local function make_anim(idle, index, frames, speed)
     return { idle = idle, index = index, frames = frames, speed = speed }
 end
 
@@ -13,10 +11,10 @@ function Player:new(tile_x, tile_y)
     Entity.new(self, 'chars/pipyaka.png', tile_x, tile_y, 32, 30, 30)
 
     self.anims = {
-        down   = Animation(0, 12, 5, 10),
-        left   = Animation(3, 17, 5, 10),
-        up     = Animation(6, 22, 5, 10),
-        right  = Animation(9, 27, 5, 10)
+        down   = make_anim(0, 12, 5, 10),
+        left   = make_anim(3, 17, 5, 10),
+        up     = make_anim(6, 22, 5, 10),
+        right  = make_anim(9, 27, 5, 10)
     }
 end
 

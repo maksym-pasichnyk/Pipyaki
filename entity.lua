@@ -1,9 +1,10 @@
-module()
-
 import 'class'
 import 'tile'
 import 'rect'
 import 'sprite'
+import 'timer'
+
+import 'scene-manager'
 
 Entity = class(Tile)
 EntityState = {
@@ -13,6 +14,8 @@ EntityState = {
 
 function Entity:new(path, tile_x, tile_y, clips, rw, rh, anims)
     Tile.new(self, 0, 0, 0, 0, 0)
+
+    self.timer = getScene().timer
 
     self.sprite = Sprite:Load(path)
     self.anims = anims or {}
@@ -40,8 +43,8 @@ function Entity:new(path, tile_x, tile_y, clips, rw, rh, anims)
     end
 end
 
-function Entity:draw()
-    Sprite.draw(self.sprite:get(self.clip), self.x, self.y)
+function Entity:render()
+    Sprite.render(self.sprite:get(self.clip), self.x, self.y)
 end
 
 function math.clamp(value, min, max)
@@ -54,7 +57,7 @@ function math.clamp(value, min, max)
     return value
 end
 
-function Entity:move(direction)
+function Entity:move(direction)    
     if self.state == EntityState.Move then
         return
     end
@@ -81,7 +84,7 @@ function Entity:move(direction)
 
         self.time = 0
         local duration = math.abs(frames) / 15
-        timer:during(duration, function(dt)
+        self.timer:during(duration, function(dt)
             local c = func(clip + frames * math.min(self.time / duration, 1))
             self.clip = math.clamp(c - math.floor(c / 12) * 12, 0, 11) + 1
             self.time = self.time + dt
@@ -109,13 +112,17 @@ function Entity:move(direction)
         local frames = anim.frames
         local speed = anim.speed
 
-        timer:tween(0.6, self, target, nil, function()
-            self.clip = anim.idle + 1
-            self.state = EntityState.Idle
-        end, function(dt)
+        local tween = self.timer:tween(0.6, self, target)        
+
+        tween.step = function(dt)
             self.clip = clip + math.floor(self.time) % frames + 1
             self.time = self.time + speed * dt
-        end)
+        end
+
+        tween.after = function()
+            self.clip = anim.idle + 1
+            self.state = EntityState.Idle
+        end
     end
 
     self.direction = direction

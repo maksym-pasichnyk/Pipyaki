@@ -1,9 +1,8 @@
-module()
-
 import 'class'
 import 'resources'
 import 'vec2'
 import 'vec4'
+import 'rect'
 
 Sprite = class()
 function Sprite:Load(path)
@@ -35,7 +34,11 @@ function Sprite:clear()
     self.clips = {}
 end
 
+function Sprite:boundingRect()
+    return self.rect
+end
+
 local love_graphics_draw = love.graphics.draw
-function Sprite:draw(x, y)
+function Sprite:render(x, y)
     love_graphics_draw(self.texture, self.quad, x - self.rect.w * self.pivot.x, y - self.rect.h * self.pivot.y)
 end

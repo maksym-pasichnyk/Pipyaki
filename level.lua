@@ -1,9 +1,8 @@
-module()
-
 import 'class'
 import 'tiles'
 import 'buffer'
 import 'list'
+import 'rect'
 import 'resources'
 
 local function compare_tiles(a, b)
@@ -30,22 +29,22 @@ function Level:load(path)
 
     local buffer = BufferStream(Resources:ReadFile(path))
 
-    local magic = buffer:readByte()
-	local type = buffer:readByte()
-    local version = buffer:readInt()
+    local magic = buffer:i8()
+	local type = buffer:i8()
+    local version = buffer:i32()
 
-    local width = buffer:readByte()
-    local height = buffer:readByte()
+    local width = buffer:i8()
+    local height = buffer:i8()
 
     self.width = width
     self.height = height
     
     local size = width * height
 
-    local data = BufferStream(buffer:read(buffer:readInt()))
+    local data = BufferStream(buffer:read(buffer:i32()))
     
     while data:__boolean() do
-        local layer = data:readByte()
+        local layer = data:i8()
 
         if layer == 0 then
             local buf = { data:read(size):byte(1, -1) }
@@ -72,12 +71,12 @@ function Level:load(path)
                 end
             end
         elseif layer == 2 then
-            local count = data:readShort()
+            local count = data:i16()
 
             for i = 1, count do
-                local tile_x = data:readByte()
-                local tile_y = data:readByte()
-                local type = data:readByte()
+                local tile_x = data:i8()
+                local tile_y = data:i8()
+                local type = data:i8()
 
                 if type ~= 0xFF then 
                     local properties = { data:read(3):byte(1, -1) }
@@ -107,13 +106,13 @@ function Level:load(path)
                 end
             end
         elseif layer == 3 then
-            local count = data:readInt()
+            local count = data:i32()
 
 			for i = 1, count do
-				local x = data:readShort()
-				local y = data:readShort()
-				local type = data:readByte()
-                local subtype = data:readByte()
+				local x = data:i16()
+				local y = data:i16()
+				local type = data:i8()
+                local subtype = data:i8()
 
                 if type == 0 then
                     self.bottom:add(TileStones20(x, y, subtype))
@@ -132,12 +131,12 @@ function Level:load(path)
                 end
             end
         elseif layer == 4 then
-            local count = data:readShort()
+            local count = data:i16()
 
             for i = 1, count do
-                local type = data:readByte()
-                local tile_x = data:readByte()
-                local tile_y = data:readByte()
+                local type = data:i8()
+                local tile_x = data:i8()
+                local tile_y = data:i8()
                 local properties = { data:read(16):byte(1, -1) }
 
                 if type == 0 then
@@ -169,12 +168,12 @@ function Level:load(path)
     self.top:sort(compare_tiles)
     self.middle:sort(compare_tiles)
 
-    self.unknown = buffer:readInt()
-	self.track = buffer:readByte()
-	self.difficulty = buffer:readByte()
-    self.intro = buffer:readByte()
+    self.unknown = buffer:i32()
+	self.track = buffer:i8()
+	self.difficulty = buffer:i8()
+    self.intro = buffer:i8()
     
-    collectgarbage 'collect'
+    -- collectgarbage 'collect'
 end
 
 function Level:getPlayerSpawnTile()
@@ -187,17 +186,23 @@ function Level:getPlayerSpawnTile()
     return nil
 end
 
-local function drawLayer(layer)
+local getScreenWidth = love.graphics.getWidth
+local getScreenHeight = love.graphics.getHeight
+local function drawLayer(layer, dx, dy)
+    local boundingRect = Rect(-dx, -dy, getScreenWidth(), getScreenHeight())
+    
     layer:foreach(function(tile)
-        tile:draw()
+        if boundingRect:intersect(tile:boundingRect()) then
+            tile:render()
+        end
     end)
 end
 
-function Level:draw()
-    drawLayer(self.ground)
-    drawLayer(self.bottom)
-    drawLayer(self.middle)
-    drawLayer(self.top)
+function Level:render(dx, dy)
+    drawLayer(self.ground, dx, dy)
+    drawLayer(self.bottom, dx, dy)
+    drawLayer(self.middle, dx, dy)
+    drawLayer(self.top, dx, dy)
 
     -- self:drawLayer(self.spawners)
     -- self:drawLayer(self.special)

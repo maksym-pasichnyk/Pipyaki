@@ -1,5 +1,3 @@
-module()
-
 import 'class'
 import 'ui/button'
 import 'ui/label'
@@ -8,16 +6,16 @@ local DefaultStyle = require 'ui/default_style'
 local Style = DefaultStyle.button
 
 TextButton = class(Button)
-function TextButton:new(text, x, y, w, h)
-    Button.new(self, x, y, w, h)
+function TextButton:new(parent, text, x, y, w, h)
+    Button.new(self, parent, x, y, w, h)
     
     self.text = text
     self.align = 'center'
 end
 
-function TextButton:OnDraw()
-    Button.OnDraw(self)
-    Label.OnDraw(self)
+function TextButton:paintEvent()
+    Button.paintEvent(self)
+    Label.paintEvent(self)
 end
 
 function TextButton:get_text_color()

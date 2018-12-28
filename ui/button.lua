@@ -1,25 +1,20 @@
-module()
-
 import 'class'
 import 'rect'
 import 'input'
 import 'event'
-import 'scene_manager'
+import 'scene-manager'
 
 import 'ui/element'
 
 local DefaultStyle = require 'ui/default_style'
 local Style = DefaultStyle.button
 
-Button = class(UIElement)
-function Button:new(x, y, w, h)
-    UIElement.new(self, x, y, w, h)
+Button = class(GraphicsItem)
+function Button:new(parent, x, y, w, h)
+    GraphicsItem.new(self, parent)
+    self:setXY(x, y)
+    self:setSize(w, h)
     self.onClick = Event()
-end
-
-function Button:OnDraw()
-    love.graphics.setColor(self:get_background_color())
-    love.graphics.rectangle('fill', self.rect.x, self.rect.y, self.rect.w, self.rect.h, 4, 4)    
 end
 
 function Button:get_background_color()
@@ -32,7 +27,12 @@ function Button:get_background_color()
     end
 end
 
-function Button:OnUpdate(dt)
+function Button:paintEvent()
+    love.graphics.setColor(self:get_background_color())
+    love.graphics.rectangle('fill', 0, 0, self.w, self.h, 4, 4)    
+end
+
+function Button:updateEvent(dt)
 
 end
 

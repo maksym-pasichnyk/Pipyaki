@@ -1,0 +1,1 @@
+00001;DSS-pipyaki test;http://wap.pipyaki.ru;http://wap.pipyaki.ru;1267534935000;N;6618;

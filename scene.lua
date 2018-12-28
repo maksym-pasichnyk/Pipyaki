@@ -1,13 +1,13 @@
-module()
-
 import 'class'
 import 'list'
 import 'ui/element'
 import 'ui/container'
+import 'timer'
 
-Scene = class(UIContainer)
+Scene = class(GraphicsScene)
 function Scene:new()
-    UIContainer.new(self)
+    GraphicsScene.new(self)
+    self.timer = Timer()
 end
 
 function Scene:destroy()
@@ -15,9 +15,9 @@ function Scene:destroy()
 end
 
 function Scene:enter()
-    pcall(UIElement.reset, self.pressed)
-    pcall(UIElement.reset, self.hovered)
-    pcall(UIElement.reset, self.focused)
+    pcall(GraphicsItem.reset, self.pressed)
+    pcall(GraphicsItem.reset, self.hovered)
+    pcall(GraphicsItem.reset, self.focused)
 
     self.pressed = nil
     self.hovered = nil
@@ -28,8 +28,12 @@ function Scene:exit()
 
 end
 
-function Scene:mousepressed(x, y, button, istouch)
-    local element = self:hit(x, y)
+function Scene:update(dt)
+    self.timer:update(dt)
+end
+
+function Scene:OnMouseDown(x, y, button, istouch)
+    local element = self:itemAt(x, y)
 
     if element then
         self.pressed = element
@@ -41,8 +45,8 @@ function Scene:mousepressed(x, y, button, istouch)
     self:setFocus(element)
 end
 
-function Scene:mousereleased(x, y, button, istouch, presses)
-    local element = self:hit(x, y)
+function Scene:OnMouseUp(x, y, button, istouch, presses)
+    local element = self:itemAt(x, y)
 
     if element and rawequal(self.pressed, element) and element.isPressed then
         invoke(element, 'OnClick', x, y, button, istouch)
@@ -55,8 +59,8 @@ function Scene:mousereleased(x, y, button, istouch, presses)
     self.pressed = nil
 end
 
-function Scene:mousemoved(x, y, dx, dy)
-    local element = self:hit(x, y)
+function Scene:OnMouseMove(x, y, dx, dy)
+    local element = self:itemAt(x, y)
 
     if not rawequal(self.hovered, element) then
         if self.hovered then
@@ -80,19 +84,25 @@ function Scene:mousemoved(x, y, dx, dy)
     end
 end
 
-function Scene:keypressed(key, scancode, isrepeat)
+function Scene:OnKeyDown(key, scancode)
     if self.focused then
-        invoke(self.focused, 'OnKeyDown', key, scancode, isrepeat)
+        invoke(self.focused, 'OnKeyDown', key, scancode)
     end
 end
 
-function Scene:keyreleased(key)
+function Scene:OnKeyRepeat(key, scancode)
+    if self.focused then
+        invoke(self.focused, 'OnKeyRepeat', key, scancode)
+    end
+end
+
+function Scene:OnKeyUp(key)
     if self.focused then
         invoke(self.focused, 'OnKeyUp', key)
     end
 end
 
-function Scene:textinput(text)
+function Scene:OnTextInput(text)
     if self.focused then
         invoke(self.focused, 'OnTextInput', text)
     end

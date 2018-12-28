@@ -1,5 +1,3 @@
-module()
-
 import 'class'
 
 vec2 = class()

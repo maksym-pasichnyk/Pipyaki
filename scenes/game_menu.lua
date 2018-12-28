@@ -1,8 +1,6 @@
-module()
-
 import 'class'
 import 'scene'
-import 'scene_manager'
+import 'scene-manager'
 import 'input'
 import 'player'
 import 'level'
@@ -49,18 +47,22 @@ function GameMenu:enter()
     self.level:addEntity(Player(5, 9))
 end
 
-function GameMenu:draw()
+function GameMenu:render()
     love.graphics.push('transform')
     love.graphics.translate(self.dx, self.dy)
-    self.level:draw()
+    self.level:render(self.dx, self.dy)
     love.graphics.pop('transform')
 
-    Scene.draw(self)
+    Scene.render(self)
 end
 
-function GameMenu:keypressed(key, scancode, isrepeat)
-    if key == 'escape' and not isrepeat then
+function GameMenu:OnKeyDown(key, scancode)
+    if key == 'escape' then
         SceneManager:switch('main')
+    elseif key == 'i' then
+
+    elseif key == 'space' then
+
     end
 end
 
@@ -69,7 +71,7 @@ function GameMenu:update(dt)
     self.level:update(dt)
 end
 
-function GameMenu:mousemoved(x, y, dx, dy)
+function GameMenu:OnMouseMove(x, y, dx, dy)
     if love.mouse.isDown(1) then
         self.dx = self.dx + dx
         self.dy = self.dy + dy

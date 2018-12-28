@@ -1,5 +1,3 @@
-module()
-
 import 'class'
 
 List = class()
@@ -13,6 +11,19 @@ function List:get(index)
     return self.data[index]
 end
 
+function List:first()
+    return self:get(1)
+end
+
+function List:back()
+    return self:get(self:size())
+end
+
+function List:pop_back()
+    assert(not self:empty())
+    table.remove(self.data)
+end
+
 function List:set(index, element)
     assert(index >= 1 and index <= self:size())
     self.data[index] = element
@@ -23,20 +34,20 @@ function List:add(element)
 end
 
 function List:contains(element)
-    local k, v = self:find(function (v) 
-        return rawequal(v, element) 
-    end)
-    
-    return k ~= nil
+    for k, v in ipairs(self.data) do
+        if rawequal(v, element) then
+            return true
+        end
+    end
+    return false
 end
 
 function List:remove(element)
-    local k, v = self:find(function (v) 
-        return rawequal(v, element) 
-    end)
-
-    if k ~= nil then
-        table.remove(self.data, k)
+    for k, v in ipairs(self.data) do
+        if rawequal(v, element) then
+            table.remove(self.data, k)
+            return
+        end
     end
 end
 
@@ -50,8 +61,6 @@ function List:find(predicate)
             return k, v
         end
     end
-
-    return nil, nil
 end
 
 function List:sort(predicate)
@@ -64,14 +73,17 @@ function List:foreach(predicate)
     end
 end
 
-function List:removeAt(index)
+function List:erase(index)
     assert(index >= 1 and index <= self:size())
-
     table.remove(self.data, index)
 end
 
 function List:size()
     return #self.data
+end
+
+function List:empty()
+    return #self.data == 0
 end
 
 function List:__pairs()

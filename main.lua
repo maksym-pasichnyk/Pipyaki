@@ -1,3 +1,5 @@
+require 'module'
+
 function invoke(self, name, ...)
     local action = self[name]
     
@@ -6,40 +8,21 @@ function invoke(self, name, ...)
     end
 end
 
-function toboolean(value)
-    return value:__boolean()
-end
+export 'invoke'
 
-require 'module'
-
-module()
-
-import 'resources'
+import 'class'
 import 'input'
-import 'event_manager'
-import 'scene_manager'
+import 'timer'
+import 'event-manager'
+import 'scene-manager'
 
-local Timer = require 'timer'
-
-local function SceneData(path, type)
-    return { path = path, type = type }
-end
+addScene('main', 'scenes/main_menu', 'MainMenu')
+addScene('game', 'scenes/game_menu', 'GameMenu')
 
 function love.load()
     love.keyboard.setKeyRepeat(true)
 
-    _G.timer = Timer()
-
-    SceneManager:new({
-        main = SceneData('scenes/main_menu', 'MainMenu'),
-        game = SceneData('scenes/game_menu', 'GameMenu')
-    })
-
     SceneManager:switch('main')
-
-    timer:every(5, function()
-        collectgarbage 'collect'
-    end)
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -72,7 +55,7 @@ function love.textinput(text)
 end
 
 function love.draw()
-    SceneManager:draw()
+    SceneManager:render()
 
     local stats = love.graphics.getStats()
     love.graphics.reset()
@@ -88,6 +71,6 @@ end
 
 function love.update(dt)
     Input:update(dt)
-    timer:update(dt)
+    Timer:update(dt)
     SceneManager:update(dt)
 end

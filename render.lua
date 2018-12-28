@@ -12,7 +12,7 @@
 -- local function switchActiveImage(self, image)
 --     if self.image then
 --         local batch = self.batches[self.image]
---         love.graphics.draw(batch.sb)
+--         love.graphics.render(batch.sb)
 --         batch.sb:clear()
 --         batch.count = 0
 --     end
@@ -33,14 +33,14 @@
 
 -- local function flushAndDraw(self, ...)
 --     self:flush()
---     return love.graphics.draw(...)
+--     return love.graphics.render(...)
 -- end
 
 -- function SpriteRenderer:flush()
 --     switchActiveImage(self, nil)
 -- end
 
--- function SpriteRenderer:draw(image, ...)
+-- function SpriteRenderer:render(image, ...)
 --     if image ~= self.image then
 --         if not self.batches[image] then
 --             if not image:typeOf("Texture") then
