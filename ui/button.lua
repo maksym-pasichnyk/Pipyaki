@@ -36,6 +36,7 @@ function Button:updateEvent(dt)
 
 end
 
-function Button:OnClick(x, y)
-    self.onClick:invoke(self, x, y)
+function Button:mouseClickEvent(event)
+    event:accept()
+    self.onClick:invoke(self, event.x, event.y)
 end

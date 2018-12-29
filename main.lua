@@ -10,6 +10,9 @@ end
 
 export 'invoke'
 
+import 'screen'
+
+
 import 'class'
 import 'input'
 import 'timer'
@@ -23,6 +26,13 @@ function love.load()
     love.keyboard.setKeyRepeat(true)
 
     SceneManager:switch('main')
+end
+
+function love.resize(w, h)
+    Screen.width = w
+    Screen.height = h
+    
+    SceneManager:resize(w, h)
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -46,6 +56,7 @@ function love.mousereleased(x, y, button, istouch, presses)
 end
 
 function love.mousemoved(x, y, dx, dy)
+    Input:mousemoved(x, y, dx, dy)    
     SceneManager:mousemoved(x, y, dx, dy)
 end
 

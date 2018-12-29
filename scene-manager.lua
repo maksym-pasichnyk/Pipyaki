@@ -6,7 +6,7 @@ local stack = {}
 local scenes = {}
 
 function addScene(name, path, type)
-    scenes[name] = module.load(path)[type]()
+    scenes[name] = module.load(path)[type]
 end
 
 function startScene(name)
@@ -18,9 +18,12 @@ function startScene(name)
     SceneManager.scene_name = name
 
     if name then
-        scene = scenes[name]
+        local Scene = scenes[name]
+        assert (Scene, 'Unable to find scene: '..name)
 
-        assert (scene, 'Unable to find scene: '..name)
+        scene = setmetatable({}, Scene)
+        scene:new()
+
 
         scene:enter()
         scene.entered = true
@@ -31,7 +34,7 @@ function getScene()
     return scene
 end
 
-SceneManager = class()
+SceneManager = {}
 function SceneManager:switch(name)
     stack = {}
 
@@ -62,60 +65,44 @@ function SceneManager:update(dt)
     end
 end
 
-function SceneManager:OnButtonClick(obj)
+function SceneManager:resize(w, h)
     if scene then
-        invoke(scene, 'OnButtonClick', obj)
-    end
-end
-
-function SceneManager:OnSliderChange(obj)
-    if scene then
-        invoke(scene, 'OnSliderChange', obj)
-    end
-end
-
-function SceneManager:OnCheckboxChange(obj)
-    if scene then
-        invoke(scene, 'OnCheckboxChange', obj)
+        scene:resize(w, h)
     end
 end
 
 function SceneManager:mousepressed(x, y, button, istouch)
     if scene then
-        invoke(scene, 'OnMouseDown', x, y, button, istouch)
+        scene:mousepressed(x, y, button, istouch)
     end
 end
 
 function SceneManager:mousereleased(x, y, button, istouch, presses)
     if scene then
-        invoke(scene, 'OnMouseUp', x, y, button, istouch, presses)
+        scene:mousereleased(x, y, button, istouch, presses)
     end
 end
 
 function SceneManager:mousemoved(x, y, dx, dy)
     if scene then
-        invoke(scene, 'OnMouseMove', x, y, dx, dy)
+        scene:mousemoved(x, y, dx, dy)
     end
 end
 
 function SceneManager:keypressed(key, scancode, isrepeat)
     if scene then
-        if isrepeat then
-            invoke(scene, 'OnKeyRepeat', key, scancode)
-        else
-            invoke(scene, 'OnKeyDown', key, scancode)
-        end
+        scene:keypressed(key, scancode, isrepeat)
     end
 end
 
 function SceneManager:keyreleased(key)
     if scene then
-        invoke(scene, 'OnKeyUp', key)
+        scene:keyreleased(key)
     end
 end
 
 function SceneManager:textinput(text)
     if scene then
-        invoke(scene, 'OnTextInput', text)
+        scene:textinput(text)
     end
 end

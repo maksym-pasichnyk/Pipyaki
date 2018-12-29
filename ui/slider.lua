@@ -8,7 +8,6 @@ import 'event'
 local DefaultStyle = require 'ui/default_style'
 local Style = DefaultStyle.slider
 
-
 Slider = class(GraphicsItem)
 function Slider:new(parent, x, y, w)
     GraphicsItem.new(self, parent)
@@ -21,28 +20,41 @@ function Slider:new(parent, x, y, w)
     self.onChange = Event()
 end
 
-function Slider:get_background_color()
-    return Style.normal.color
-end
-
-function Slider:get_thumb_color()
-    return Style.normal.thumb_color
+function Slider:boundingRect()
+    return Rect(self.x - 10, self.y - 5, self.w + 20, 20)
 end
 
 function Slider:paintEvent()
-    Button.paintEvent(self)
+    love.graphics.setColor(Style.normal.color)
+    love.graphics.rectangle('fill', 0, 0, self.w, self.h, 4, 4)  
 
-    love.graphics.setColor(self:get_thumb_color())
+    love.graphics.setColor(Style.normal.thumb_color)
     love.graphics.circle('fill', self.thumb.x, self.thumb.y, 10)
 end
 
-function Slider:OnMouseDrag(x, y)
-    self.thumb.x = math.min(self.w, math.max(0, x))
+function Slider:setValue(value)
+    value = math.min(math.max(0, value), 1)
 
-    local old_value = self.value
-    self.value = self.thumb.x / self.w
+    if value ~= self.value then
+        self.value = value
+        self.thumb.x = self.w * value
 
-    if old_value ~= self.value then
         self.onChange:invoke(self)
+    end
+end
+
+function Slider:mousePressEvent(event)
+    event:accept()
+
+    local x = self:mapFromScene(event.x, 0)
+    self:setValue(math.min(self.w, math.max(0, x)) / self.w)
+end
+
+function Slider:mouseMoveEvent(event)
+    if event.drag then
+        event:accept()
+
+        local x = self:mapFromScene(event.x, 0)
+        self:setValue(math.min(self.w, math.max(0, x)) / self.w)
     end
 end

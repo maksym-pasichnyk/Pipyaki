@@ -164,6 +164,16 @@ function GraphicsItem:render()
     end
 end
 
+function GraphicsItem:resize(w, h)
+    if self.enabled and self.active then
+        invoke(self, 'resizeEvent', w, h)
+        
+        self.childs:foreach(function(child)
+            child:resize(w, h)
+        end)
+    end
+end
+
 function GraphicsItem:update(dt)
     if self.enabled and self.active then
         invoke(self, 'updateEvent', dt)
@@ -178,4 +188,22 @@ function GraphicsItem:reset()
     self.isPressed = false
     self.isMouseOver = false
     self.isFocused = false
+end
+
+function GraphicsItem:mousePressEvent(event)
+end
+
+function GraphicsItem:mouseClickEvent(event)
+end
+
+function GraphicsItem:mouseReleaseEvent(event)
+end
+
+function GraphicsItem:mouseMoveEvent(event)
+end
+
+function GraphicsItem:keyPressEvent(event)
+end
+
+function GraphicsItem:keyReleaseEvent(event)
 end

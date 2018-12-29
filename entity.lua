@@ -3,6 +3,7 @@ import 'tile'
 import 'rect'
 import 'sprite'
 import 'timer'
+import 'rect'
 
 import 'scene-manager'
 
@@ -45,6 +46,10 @@ end
 
 function Entity:render()
     Sprite.render(self.sprite:get(self.clip), self.x, self.y)
+end
+
+function Entity:boundingRect()
+    return Rect(self.x - 16, self.y - 16, 32, 32)
 end
 
 function math.clamp(value, min, max)

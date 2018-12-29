@@ -67,9 +67,9 @@ function List:sort(predicate)
     table.sort(self.data, predicate)
 end
 
-function List:foreach(predicate)
+function List:foreach(predicate, ...)
     for k, v in pairs(self.data) do
-        predicate(v)
+        predicate(v, ...)
     end
 end
 

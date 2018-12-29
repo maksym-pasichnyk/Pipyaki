@@ -2,6 +2,7 @@ import 'class'
 import 'scene'
 import 'scene-manager'
 import 'input'
+import 'screen'
 
 import 'ui/element'
 import 'ui/text_button'
@@ -18,8 +19,8 @@ MainMenu = class(Scene)
 function MainMenu:new()
     Scene.new(self)
 
-    local sw = love.graphics.getWidth()
-    local sh = love.graphics.getHeight()
+    local sw = Screen.width
+    local sh = Screen.height
 
     local cx = sw / 2
     local cy = sh / 2
@@ -46,7 +47,7 @@ function MainMenu:new()
     local x = cx - w / 2
     local y = cy - (4 * (h + space) - space) / 2
 
-    self:add(Label(nil, 'Main Menu', 0, 0, love.graphics.getWidth(), 40))
+    self:add(Label(nil, 'Main Menu', 0, 0, Screen.width, 40))
 
     for i, entry in ipairs(menu) do
         local button = self:add(TextButton(nil, entry.text, x, y, w, h))
@@ -64,33 +65,15 @@ function MainMenu:new()
     music.onToggle:add(function (this)
         volume.enabled = this.value
     end)
-
-    -- self.
-
-    -- local cols = 1
-    -- local rows = 1
-
-    -- local px = 10
-    -- local space = 10
-
-    -- local w = 200
-
-    -- local width = cols * (w + space) - space
-    -- local left = cx - width / 2
-
-    -- for j = 1, rows do
-    --     local x = left
-    --     for i = 1, cols do
-    --         -- self:add(TextButton('Hello', x, 0 + (w + space) * (j - 1), w, w))
-    --         x = x + w + space
-    --     end
-    -- end
 end
 
-function MainMenu:OnKeyDown(key, scancode)
-    Scene.OnKeyDown(self, key, scancode)
-    
-    if key == 'escape' then
+function MainMenu:keyPressEvent(event)
+    if event.accepted or not event:single() then
+        return
+    end
+
+    if event.key == 'escape' then
+        event:accept()
         love.event.quit()
     end
 end

@@ -4,6 +4,11 @@ import 'ui/element'
 import 'ui/container'
 import 'timer'
 
+local input = module.load 'input'
+local InputEvent = input.InputEvent
+local KeyEvent = input.KeyEvent
+local MouseEvent = input.MouseEvent
+
 Scene = class(GraphicsScene)
 function Scene:new()
     GraphicsScene.new(self)
@@ -29,82 +34,101 @@ function Scene:exit()
 end
 
 function Scene:update(dt)
+    GraphicsScene.update(self, dt)
     self.timer:update(dt)
 end
 
-function Scene:OnMouseDown(x, y, button, istouch)
-    local element = self:itemAt(x, y)
+function Scene:mousepressed(x, y, button, istouch)
+    local event = MouseEvent(x, y, button)
 
+    local element = self:itemAt(x, y)
     if element then
         self.pressed = element
-
+        
         element.isPressed = true
-        invoke(element, 'OnMouseDown', x, y, button, istouch)
+        element:mousePressEvent(event)
     end
-
     self:setFocus(element)
+    self:mousePressEvent(event)
+    return event.accepted
 end
 
-function Scene:OnMouseUp(x, y, button, istouch, presses)
+function Scene:mousereleased(x, y, button, istouch, presses)
+    local event = MouseEvent(x, y, button)
+
     local element = self:itemAt(x, y)
 
     if element and rawequal(self.pressed, element) and element.isPressed then
-        invoke(element, 'OnClick', x, y, button, istouch)
+        element:mouseClickEvent(event)
         element.isPressed = false
     elseif self.pressed then
-        invoke(self.pressed, 'OnMouseUp', x, y, button, istouch)
+        self.pressed:mouseReleaseEvent(event)
         self.pressed.isPressed = false
     end
-
     self.pressed = nil
+    self:mouseReleaseEvent(event)
+    return event.accepted
 end
 
-function Scene:OnMouseMove(x, y, dx, dy)
+function Scene:mousemoved(x, y, dx, dy)
     local element = self:itemAt(x, y)
 
     if not rawequal(self.hovered, element) then
         if self.hovered then
             self.hovered.isPressed = false
             self.hovered.isMouseOver = false
-            invoke(self.hovered, 'OnMouseLeave')
+            invoke(self.hovered, 'mouseLeaveEvent')
         end
 
         self.hovered = element
 
         if self.hovered then
             self.hovered.isMouseOver = true
-            invoke(self.hovered, 'OnMouseEnter')
+            invoke(self.hovered, 'mouseEnterEvent')
         end
     end
 
+    local event = InputEvent()
+    event.x = x
+    event.y = y
+    event.dx = dx
+    event.dy = dy
+    event.drag = false
+
     if self.pressed then
-        invoke(self.pressed, 'OnMouseDrag', x, y, dx, dy)
+        event.drag = true
+        self.pressed:mouseMoveEvent(event)
+        event.drag = false
     elseif self.hovered then
-        invoke(self.hovered, 'OnMouseMove', x, y, dx, dy)
+        self.hovered:mouseMoveEvent(event)
     end
+    self:mouseMoveEvent(event)
+    return event.accepted
 end
 
-function Scene:OnKeyDown(key, scancode)
+function Scene:keypressed(key, scancode, isrepeat)
+    local event = KeyEvent(key, scancode, '', isrepeat)
+
     if self.focused then
-        invoke(self.focused, 'OnKeyDown', key, scancode)
+        self.focused:keyPressEvent(event)
     end
+    self:keyPressEvent(event)
+    return event.accepted
 end
 
-function Scene:OnKeyRepeat(key, scancode)
+function Scene:keyreleased(key, scancode)
+    local event = KeyEvent(key, scancode, '', false)
+
     if self.focused then
-        invoke(self.focused, 'OnKeyRepeat', key, scancode)
+        self.focused:keyReleaseEvent(event)
     end
+    self:keyReleaseEvent(event)
+    return event.accepted
 end
 
-function Scene:OnKeyUp(key)
+function Scene:textinput(text)
     if self.focused then
-        invoke(self.focused, 'OnKeyUp', key)
-    end
-end
-
-function Scene:OnTextInput(text)
-    if self.focused then
-        invoke(self.focused, 'OnTextInput', text)
+        invoke(self.focused, 'inputTextEvent', text)
     end
 end
 
@@ -115,13 +139,13 @@ function Scene:setFocus(element)
 
     if self.focused then
         self.focused.isFocused = false
-        invoke(self.focused, 'OnLostFocus')
+        invoke(self.focused, 'lostFocusEvent')
     end
 
     self.focused = element
 
     if self.focused then
         self.focused.isFocused = true
-        invoke(self.focused, 'OnGainFocus')
+        invoke(self.focused, 'gainFocusEvent')
     end
 end

@@ -4,6 +4,8 @@ import 'buffer'
 import 'list'
 import 'rect'
 import 'resources'
+import 'screen'
+import 'ui/element'
 
 local function compare_tiles(a, b)
     if a.layer == b.layer then
@@ -17,8 +19,19 @@ local function compare_tiles(a, b)
     return a.layer < b.layer
 end
 
-Level = class()
-function Level:load(path)    
+Level = class(GraphicsItem)
+function Level:new()
+    GraphicsItem.new(self)
+    self.dx = 0
+    self.dy = 0
+    self:setSize(Screen.width, Screen.height)
+end
+
+function Level:resizeEvent(w, h)
+    self:setSize(w, h)
+end
+
+function Level:load(path)
     self.ground = List()
     self.bottom = List()
     self.middle = List()
@@ -186,10 +199,8 @@ function Level:getPlayerSpawnTile()
     return nil
 end
 
-local getScreenWidth = love.graphics.getWidth
-local getScreenHeight = love.graphics.getHeight
 local function drawLayer(layer, dx, dy)
-    local boundingRect = Rect(-dx, -dy, getScreenWidth(), getScreenHeight())
+    local boundingRect = Rect(-dx, -dy, Screen.width, Screen.height)
     
     layer:foreach(function(tile)
         if boundingRect:intersect(tile:boundingRect()) then
@@ -198,17 +209,24 @@ local function drawLayer(layer, dx, dy)
     end)
 end
 
-function Level:render(dx, dy)
-    drawLayer(self.ground, dx, dy)
-    drawLayer(self.bottom, dx, dy)
-    drawLayer(self.middle, dx, dy)
-    drawLayer(self.top, dx, dy)
+function Level:mouseMoveEvent(event)
+    if event.drag then
+        event:accept()
 
-    -- self:drawLayer(self.spawners)
-    -- self:drawLayer(self.special)
+        self.dx = self.dx + event.dx
+        self.dy = self.dy + event.dy
+    end
 end
 
-function Level:update(dt)
+function Level:paintEvent()
+    love.graphics.translate(self.dx, self.dy)
+    drawLayer(self.ground, self.dx, self.dy)
+    drawLayer(self.bottom, self.dx, self.dy)
+    drawLayer(self.middle, self.dx, self.dy)
+    drawLayer(self.top, self.dx, self.dy)
+end
+
+function Level:updateEvent(dt)
     self.update_tiles:foreach(function(tile)
         tile:update(dt)
     end)

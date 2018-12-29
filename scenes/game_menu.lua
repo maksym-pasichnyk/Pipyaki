@@ -4,6 +4,12 @@ import 'scene-manager'
 import 'input'
 import 'player'
 import 'level'
+import 'resources'
+import 'graphics'
+import 'ui/element'
+import 'ui/label'
+import 'screen'
+import 'weapon-manager'
 
 local maps = {
     'maps/campaign/map0.map',
@@ -37,43 +43,30 @@ local maps = {
 }
 
 GameMenu = class(Scene)
-function GameMenu:enter()
+function GameMenu:new()
+    Scene.new(self)
+    
     self.dx = 0
     self.dy = 0
 
     self.level = Level()
-
     self.level:load(maps[1])
     self.level:addEntity(Player(5, 9))
+
+    self:add(self.level)
+    self:add(WeaponManager())
 end
 
-function GameMenu:render()
-    love.graphics.push('transform')
-    love.graphics.translate(self.dx, self.dy)
-    self.level:render(self.dx, self.dy)
-    love.graphics.pop('transform')
-
-    Scene.render(self)
-end
-
-function GameMenu:OnKeyDown(key, scancode)
-    if key == 'escape' then
-        SceneManager:switch('main')
-    elseif key == 'i' then
-
-    elseif key == 'space' then
-
-    end
-end
-
-function GameMenu:update(dt)
-    Scene.update(self, dt)
-    self.level:update(dt)
-end
-
-function GameMenu:OnMouseMove(x, y, dx, dy)
-    if love.mouse.isDown(1) then
-        self.dx = self.dx + dx
-        self.dy = self.dy + dy
+function GameMenu:keyPressEvent(event)
+    if event:single() then
+        local key = event.key
+        if key == 'escape' then
+            event:accept()
+            SceneManager:switch('main')
+        elseif key == 'i' then
+            event:accept()
+        elseif key == 'space' then
+            event:accept()
+        end
     end
 end
