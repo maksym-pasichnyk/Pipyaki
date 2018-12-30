@@ -190,7 +190,7 @@ function Level:load(path)
 end
 
 function Level:getPlayerSpawnTile()
-    for i, tile in ipairs(self.spawners) do
+    for i, tile in pairs(self.spawners.data) do
         if tile.race == TileSpawnPoint.Race.Pipyaka then
             return tile
         end

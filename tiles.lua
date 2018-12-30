@@ -138,6 +138,8 @@ TileSpawnPoint.Team = {
 function TileSpawnPoint:new(x, y, properties)
     TileSprite.new(self, 'icon.png', 0, 16, 16, x * 30, y * 30, 0, 0)
 
+    self.tile_x = x
+    self.tile_y = y
     self.race = properties[1]
     self.total_count = properties[2]
     self.max_alives = properties[3]

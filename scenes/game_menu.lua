@@ -2,7 +2,7 @@ import 'class'
 import 'scene'
 import 'scene-manager'
 import 'input'
-import 'player'
+import 'pipyaka'
 import 'level'
 import 'resources'
 import 'graphics'
@@ -53,7 +53,9 @@ function GameMenu:new()
     
     self.level = Level()
     self.level:load(maps[1])
-    self.level:addEntity(Player(5, 9))
+
+    local tile = self.level:getPlayerSpawnTile()
+    self.level:addEntity(Pipyaka(tile.tile_x, tile.tile_y))
 
     self.weapons = WeaponManager()
 

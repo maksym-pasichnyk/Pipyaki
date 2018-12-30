@@ -4,7 +4,7 @@ List = class()
 function List:new(data)
     self.data = {}
     if data then
-        for i, v in ipairs(data) do
+        for i, v in List.__ipairs(data) do
             self.data[i] = v
         end
     end
@@ -53,7 +53,7 @@ function List:add(element)
 end
 
 function List:contains(element)
-    for k, v in ipairs(List.__data(self)) do
+    for k, v in List.__ipairs(self) do
         if rawequal(v, element) then
             return true
         end
@@ -62,7 +62,7 @@ function List:contains(element)
 end
 
 function List:remove(element)
-    for k, v in ipairs(List.__data(self)) do
+    for k, v in List.__ipairs(self) do
         if rawequal(v, element) then
             table.remove(List.__data(self), k)
             return
@@ -78,7 +78,7 @@ function List:clear()
 end
 
 function List:find(predicate)
-    for i, v in ipairs(List.__data(self)) do
+    for i, v in List.__ipairs(self) do
         if predicate(v) then
             return i, v
         end
@@ -90,7 +90,7 @@ function List:sort(predicate)
 end
 
 function List:foreach(predicate, ...)
-    for i, v in ipairs(List.__data(self)) do
+    for i, v in List.__ipairs(self) do
         predicate(v, ...)
     end
 end
@@ -109,13 +109,9 @@ function List:empty()
 end
 
 function List:__pairs()
-    return pairs, List.__data(self), nil
+    return ipairs(List.__data(self))
 end
 
 function List:__ipairs()
-    return pairs, List.__data(self), nil
+    return ipairs(List.__data(self))
 end
-
--- list = getmetatable(List())
--- list.__index = List.get
--- list.__newindex = List.set
