@@ -11,8 +11,6 @@ end
 export 'invoke'
 
 import 'screen'
-
-
 import 'class'
 import 'input'
 import 'timer'
@@ -63,6 +61,47 @@ end
 function love.textinput(text)
     Input:textinput(text)
     SceneManager:textinput(text)
+end
+
+function love.joystickadded(joystick)
+    Input:joystickadded(joystick)
+end
+
+function love.joystickremoved(joystick)
+    Input:joystickremoved(joystick)
+end
+
+-- function love.joystickpressed(joystick, button)
+--     SceneManager:joystickpressed(joystick, button)
+-- end
+
+-- function love.joystickreleased(joystick, button)
+--     SceneManager:joystickreleased(joystick, button)
+-- end
+
+-- function love.joystickaxis(joystick, axis, value)
+--     SceneManager:joystickaxis(joystick, axis, value)
+-- end
+
+function love.joystickhat(joystick, hat, direction)
+    SceneManager:joystickhat(joystick, hat, direction)
+end
+
+---------------------------------------------------------
+
+function love.gamepadpressed(joystick, button)
+    Input:joystickpressed(joystick, button)
+    SceneManager:joystickpressed(joystick, button)
+end
+
+function love.gamepadreleased(joystick, button)
+    Input:joystickreleased(joystick, button)
+    SceneManager:joystickreleased(joystick, button)
+end
+
+function love.gamepadaxis(joystick, axis, value)
+    Input:joystickaxis(joystick, axis, value)
+    SceneManager:joystickaxis(joystick, axis, value)
 end
 
 function love.draw()

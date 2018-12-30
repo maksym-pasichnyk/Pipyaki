@@ -210,11 +210,21 @@ local function drawLayer(layer, dx, dy)
 end
 
 function Level:mouseMoveEvent(event)
-    if event.drag then
+    if self.isDragging then
         event:accept()
 
         self.dx = self.dx + event.dx
         self.dy = self.dy + event.dy
+    end
+end
+
+function Level:joystickPressEvent(event)
+    for k, tile in pairs(self.update_tiles.data) do
+        invoke(tile, 'joystickPressEvent', event)
+
+        if event.accept then
+            return
+        end
     end
 end
 

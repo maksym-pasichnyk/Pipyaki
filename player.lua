@@ -1,6 +1,7 @@
 import 'class'
 import 'entity'
 import 'input'
+import 'scene-manager'
 
 local function make_anim(idle, index, frames, speed)
     return { idle = idle, index = index, frames = frames, speed = speed }
@@ -18,20 +19,39 @@ function Player:new(tile_x, tile_y)
     }
 end
 
+function Player:getInputAxis()
+    local horizontal = Input:GetAxis 'leftx#1'
+    local vertical = Input:GetAxis 'lefty#1'
+
+    if math.abs(horizontal) > math.abs(vertical) then
+        vertical = 0
+    else
+        horizontal = 0
+    end
+
+    return horizontal, vertical
+end
+
 function Player:update(dt)
-    if Input:GetButton('left') then
+    if getScene().weapons.enabled then
+        return
+    end
+
+    local h, v = self:getInputAxis()
+
+    if Input:GetAnyButton {'left', 'dpleft#1', 'a'} or h < 0 then
         self:move('left')
     end
     
-    if Input:GetButton('right') then
+    if Input:GetAnyButton {'right', 'dpright#1', 'd'} or h > 0 then
         self:move('right')
     end
     
-    if Input:GetButton('up') then
+    if Input:GetAnyButton {'up', 'dpup#1', 'w'} or v < 0 then
         self:move('up')
     end
     
-    if Input:GetButton('down') then
+    if Input:GetAnyButton {'down', 'dpdown#1', 's'} or v > 0 then
         self:move('down')
     end
 end

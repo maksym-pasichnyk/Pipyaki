@@ -53,19 +53,30 @@ function TextField:append(text)
     self.onEdit:invoke(self)
 end
 
+function TextField:mousePressEvent(event)
+    event:accept()
+
+    getScene():setFocus(self)
+end
+
 function TextField:keyPressEvent(event)
-    local key = event.key
-    if key == 'backspace' then
-        self:removeLast()
-        event:accept()
-    elseif key == 'escape' then
-        if event:single() then
+    if self.isFocused then
+        local key = event.key
+        if key == 'backspace' then
+            self:removeLast()
             event:accept()
-            getScene():setFocus(nil)
+        elseif key == 'escape' then
+            if event:single() then
+                event:accept()
+                getScene():setFocus(nil)
+            end
         end
     end
 end
 
-function TextField:inputTextEvent(text)
-    self:append(text)
+function TextField:inputTextEvent(event)
+    if self.isFocused then
+        self:append(event.text)
+        event:accept()
+    end
 end

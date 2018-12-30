@@ -20,13 +20,7 @@ function Scene:destroy()
 end
 
 function Scene:enter()
-    pcall(GraphicsItem.reset, self.pressed)
-    pcall(GraphicsItem.reset, self.hovered)
-    pcall(GraphicsItem.reset, self.focused)
-
-    self.pressed = nil
-    self.hovered = nil
-    self.focused = nil
+    self:reset()
 end
 
 function Scene:exit()
@@ -39,35 +33,15 @@ function Scene:update(dt)
 end
 
 function Scene:mousepressed(x, y, button, istouch)
-    local event = MouseEvent(x, y, button)
+    self:mousePressEvent(MouseEvent(x, y, button))
 
-    local element = self:itemAt(x, y)
-    if element then
-        self.pressed = element
-        
-        element.isPressed = true
-        element:mousePressEvent(event)
+    if self.focused and not self.focused:contains(x, y) then
+        self:setFocus(nil)
     end
-    self:setFocus(element)
-    self:mousePressEvent(event)
-    return event.accepted
 end
 
 function Scene:mousereleased(x, y, button, istouch, presses)
-    local event = MouseEvent(x, y, button)
-
-    local element = self:itemAt(x, y)
-
-    if element and rawequal(self.pressed, element) and element.isPressed then
-        element:mouseClickEvent(event)
-        element.isPressed = false
-    elseif self.pressed then
-        self.pressed:mouseReleaseEvent(event)
-        self.pressed.isPressed = false
-    end
-    self.pressed = nil
-    self:mouseReleaseEvent(event)
-    return event.accepted
+    self:mouseReleaseEvent(MouseEvent(x, y, button))
 end
 
 function Scene:mousemoved(x, y, dx, dy)
@@ -75,61 +49,45 @@ function Scene:mousemoved(x, y, dx, dy)
 
     if not rawequal(self.hovered, element) then
         if self.hovered then
-            self.hovered.isPressed = false
-            self.hovered.isMouseOver = false
-            invoke(self.hovered, 'mouseLeaveEvent')
+            self.hovered:mouseLeaveEvent()
         end
 
         self.hovered = element
 
         if self.hovered then
-            self.hovered.isMouseOver = true
-            invoke(self.hovered, 'mouseEnterEvent')
+            self.hovered:mouseEnterEvent()
         end
     end
 
-    local event = InputEvent()
-    event.x = x
-    event.y = y
-    event.dx = dx
-    event.dy = dy
-    event.drag = false
-
-    if self.pressed then
-        event.drag = true
-        self.pressed:mouseMoveEvent(event)
-        event.drag = false
-    elseif self.hovered then
-        self.hovered:mouseMoveEvent(event)
-    end
-    self:mouseMoveEvent(event)
-    return event.accepted
+    self:mouseMoveEvent(InputEvent { x = x, y = y, dx = dx, dy = dy })
 end
 
 function Scene:keypressed(key, scancode, isrepeat)
-    local event = KeyEvent(key, scancode, '', isrepeat)
-
-    if self.focused then
-        self.focused:keyPressEvent(event)
-    end
-    self:keyPressEvent(event)
-    return event.accepted
+    self:keyPressEvent(KeyEvent(key, scancode, '', isrepeat))
 end
 
 function Scene:keyreleased(key, scancode)
-    local event = KeyEvent(key, scancode, '', false)
-
-    if self.focused then
-        self.focused:keyReleaseEvent(event)
-    end
-    self:keyReleaseEvent(event)
-    return event.accepted
+    self:keyReleaseEvent(KeyEvent(key, scancode, '', false))
 end
 
 function Scene:textinput(text)
-    if self.focused then
-        invoke(self.focused, 'inputTextEvent', text)
-    end
+    self:inputTextEvent(InputEvent { text = text })
+end
+
+function Scene:joystickpressed(joystick, button)
+    self:joystickPressEvent(InputEvent { joystick = joystick, button = button })
+end
+
+function Scene:joystickreleased(joystick, button)
+    self:joystickReleaseEvent(InputEvent { joystick = joystick, button = button })
+end
+
+function Scene:joystickaxis(joystick, axis, value)
+    self:joystickAxisEvent(InputEvent { joystick = joystick, axis = axis, value = value })
+end
+
+function Scene:joystickhat(joystick, hat, direction)
+    self:joystickHatEvent(InputEvent { joystick = joystick, hat = hat, direction = direction })
 end
 
 function Scene:setFocus(element)
@@ -138,14 +96,12 @@ function Scene:setFocus(element)
     end
 
     if self.focused then
-        self.focused.isFocused = false
-        invoke(self.focused, 'lostFocusEvent')
+        self.focused:lostFocusEvent()
     end
 
     self.focused = element
 
     if self.focused then
-        self.focused.isFocused = true
-        invoke(self.focused, 'gainFocusEvent')
+        self.focused:gainFocusEvent()
     end
 end

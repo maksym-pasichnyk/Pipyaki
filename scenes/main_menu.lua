@@ -67,7 +67,16 @@ function MainMenu:new()
     end)
 end
 
+function MainMenu:joystickPressEvent(event)
+    if event.button == 'b' then
+        event:accept()
+        love.event.quit()
+    end
+end
+
 function MainMenu:keyPressEvent(event)
+    Scene.keyPressEvent(self, event)
+    
     if event.accepted or not event:single() then
         return
     end

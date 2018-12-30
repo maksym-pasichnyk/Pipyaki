@@ -7,9 +7,8 @@ import 'level'
 import 'resources'
 import 'graphics'
 import 'ui/element'
-import 'ui/label'
-import 'screen'
 import 'weapon-manager'
+import 'list'
 
 local maps = {
     'maps/campaign/map0.map',
@@ -45,19 +44,53 @@ local maps = {
 GameMenu = class(Scene)
 function GameMenu:new()
     Scene.new(self)
-    
+
     self.dx = 0
     self.dy = 0
-
+ 
+    self.stack = List()
+    self.stack:add(self)
+    
     self.level = Level()
     self.level:load(maps[1])
     self.level:addEntity(Player(5, 9))
 
+    self.weapons = WeaponManager()
+
     self:add(self.level)
-    self:add(WeaponManager())
+    self:add(self.weapons)
+end
+
+function GameMenu:enter()
+    self.weapons.enabled = false
+end
+
+function GameMenu:escape_action()
+end
+
+function GameMenu:joystickPressEvent(event)
+    Scene.joystickPressEvent(self, event)
+
+    if event.accepted then
+        return
+    end
+
+    if event.button == 'b' then
+        event:accept()
+        SceneManager:switch('main')
+    elseif event.button == 'y' then
+        event:accept()
+        self.weapons.enabled = not self.weapons.enabled
+    end
 end
 
 function GameMenu:keyPressEvent(event)
+    Scene.keyPressEvent(self, event)
+
+    if event.accepted then
+        return
+    end
+
     if event:single() then
         local key = event.key
         if key == 'escape' then
@@ -65,6 +98,7 @@ function GameMenu:keyPressEvent(event)
             SceneManager:switch('main')
         elseif key == 'i' then
             event:accept()
+            self.weapons.enabled = not self.weapons.enabled
         elseif key == 'space' then
             event:accept()
         end

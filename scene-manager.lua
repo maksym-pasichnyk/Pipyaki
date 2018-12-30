@@ -106,3 +106,27 @@ function SceneManager:textinput(text)
         scene:textinput(text)
     end
 end
+
+function SceneManager:joystickpressed(joystick, button)
+    if scene then
+        scene:joystickpressed(joystick, button)
+    end
+end
+
+function SceneManager:joystickreleased(joystick, button)
+    if scene then
+        scene:joystickreleased(joystick, button)
+    end
+end
+
+function SceneManager:joystickaxis(joystick, axis, value)
+    if scene then
+        scene:joystickaxis(joystick, axis, value)
+    end
+end
+
+function SceneManager:joystickhat(joystick, hat, direction)
+    if scene then
+        scene:joystickhat(joystick, hat, direction)
+    end
+end

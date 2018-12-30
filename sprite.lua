@@ -26,6 +26,14 @@ function Sprite:add(rect, pivot, border)
     return clip
 end
 
+function Sprite:getWidth()
+    return self.texture:getWidth()
+end
+
+function Sprite:getHeight()
+    return self.texture:getHeight()
+end
+
 function Sprite:get(index)
     return self.clips[index]
 end
@@ -39,6 +47,9 @@ function Sprite:boundingRect()
 end
 
 local love_graphics_draw = love.graphics.draw
-function Sprite:render(x, y)
-    love_graphics_draw(self.texture, self.quad, x - self.rect.w * self.pivot.x, y - self.rect.h * self.pivot.y)
+function Sprite:render(x, y, w, h)
+    local sx = (w or self.rect.w) / self.rect.w
+    local sy = (h or self.rect.h) / self.rect.h
+
+    love_graphics_draw(self.texture, self.quad, x - self.rect.w * self.pivot.x, y - self.rect.h * self.pivot.y, 0, sx, sy)
 end
