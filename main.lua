@@ -1,35 +1,26 @@
-require 'module'
+package.path = package.path..';./src/?.lua'
 
-function invoke(self, name, ...)
-    local action = self[name]
-    
-    if action then
-        action(self, ...)
-    end
-end
+require 'general/module'
+import 'general/class'
+_G.class = class
 
-export 'invoke'
+----------------------------------------------------------
 
-import 'screen'
-import 'class'
-import 'input'
-import 'timer'
-import 'event-manager'
-import 'scene-manager'
-
-addScene('main', 'scenes/main_menu', 'MainMenu')
-addScene('game', 'scenes/game_menu', 'GameMenu')
+import 'general/scene/scene-manager'
+import 'general/graphics/screen'
+import 'general/input'
+import 'general/timer'
 
 function love.load()
     love.keyboard.setKeyRepeat(true)
 
-    SceneManager:switch('main')
+    module.load 'game/init'
 end
 
 function love.resize(w, h)
     Screen.width = w
     Screen.height = h
-    
+
     SceneManager:resize(w, h)
 end
 
@@ -54,7 +45,7 @@ function love.mousereleased(x, y, button, istouch, presses)
 end
 
 function love.mousemoved(x, y, dx, dy)
-    Input:mousemoved(x, y, dx, dy)    
+    Input:mousemoved(x, y, dx, dy)
     SceneManager:mousemoved(x, y, dx, dy)
 end
 
@@ -70,18 +61,6 @@ end
 function love.joystickremoved(joystick)
     Input:joystickremoved(joystick)
 end
-
--- function love.joystickpressed(joystick, button)
---     SceneManager:joystickpressed(joystick, button)
--- end
-
--- function love.joystickreleased(joystick, button)
---     SceneManager:joystickreleased(joystick, button)
--- end
-
--- function love.joystickaxis(joystick, axis, value)
---     SceneManager:joystickaxis(joystick, axis, value)
--- end
 
 function love.joystickhat(joystick, hat, direction)
     SceneManager:joystickhat(joystick, hat, direction)
@@ -110,13 +89,11 @@ function love.draw()
     local stats = love.graphics.getStats()
     love.graphics.reset()
     love.graphics.setColor(0, 0, 0, 255 * .75)
-    love.graphics.rectangle("fill", 5, 5, 220, 85, 2)
+    love.graphics.rectangle("fill", 5, 5, 215, 65, 2)
     love.graphics.setColor(255, 255, 255)
     love.graphics.print(love.timer.getFPS() .. "fps", 10, 10)
-    -- love.graphics.print('x = '..player.tile_x..'\t'..'y = '..player.tile_y, 10, 30)
     love.graphics.print("drawcalls: " .. stats.drawcalls, 10, 30)
-    -- love.graphics.print("map: " .. map, 10, 50)
-    love.graphics.print('memory (MB): ' .. (collectgarbage 'count' / 1024), 10,70)
+    love.graphics.print('memory (MB): ' .. (collectgarbage 'count' / 1024), 10, 50)
 end
 
 function love.update(dt)
