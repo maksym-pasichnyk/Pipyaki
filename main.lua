@@ -1,4 +1,4 @@
-package.path = package.path..';./src/?.lua'
+love.filesystem.setRequirePath(package.path..';src/?.lua')
 
 require 'general/module'
 import 'general/class'

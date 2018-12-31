@@ -9,7 +9,7 @@ function love.conf(t)
 
     t.audio.mixwithsystem = true        -- Keep background music playing when opening LOVE (boolean, iOS and Android only)
 
-    t.window.title = "Untitled"         -- The window title (string)
+    t.window.title = "Pipyaki"         -- The window title (string)
     t.window.icon = nil                 -- Filepath to an image to use as the window's icon (string)
     t.window.width = 800                -- The window width (number)
     t.window.height = 600               -- The window height (number)
@@ -19,7 +19,7 @@ function love.conf(t)
     t.window.minheight = 1              -- Minimum window height if the window is resizable (number)
     t.window.fullscreen = false         -- Enable fullscreen (boolean)
     t.window.fullscreentype = "desktop" -- Choose between "desktop" fullscreen or "exclusive" fullscreen mode (string)
-    t.window.vsync = 1                  -- Vertical sync mode (number)
+    t.window.vsync = 0                  -- Vertical sync mode (number)
     t.window.msaa = 0                   -- The number of samples to use with multi-sampled antialiasing (number)
     t.window.depth = nil                -- The number of bits per sample in the depth buffer
     t.window.stencil = nil              -- The number of bits per sample in the stencil buffer

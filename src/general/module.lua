@@ -8,31 +8,24 @@ local table_insert  = table.insert
 local module = {
     loaded = {};
     preload = {};
-    path = package.path
+    path = love.filesystem.getRequirePath()
 }
 
 local function path_loader(name, paths, loader_func)
     local errors = {}
-    local loader
 
     name = string_gsub(name, '%.', '/')
 
     for path in string_gmatch(paths, '[^;]+') do
         path = string_gsub(path, '%?', name)
 
-        local errmsg
+        local chunk, errormsg = loader_func(path)
 
-        loader, errmsg = loader_func(path)
-
-        if loader then
-            break
+        if chunk then
+            return chunk
         end
 
         table_insert(errors, string.format("no file '%s'", path))
-    end
-
-    if loader then
-        return loader
     end
 
     return table_concat(errors, '\n') .. '\n'
@@ -47,7 +40,7 @@ local function preload_loader(name)
 end
 
 local function lua_loader(name)
-    return path_loader(name, module.path, loadfile)
+    return path_loader(name, module.path, love.filesystem.load)
 end
 
 local loaders = {
@@ -92,7 +85,7 @@ function module.load(name)
     if env == nil then
         local chunk, errors = findchunk(name)
         if not chunk then
-            error(errors, 2)
+            error(errors, 3)
         end
 
         env = module.new()
