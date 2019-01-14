@@ -82,7 +82,7 @@ end
 
 TileBushesBig = class(TileSprite)
 function TileBushesBig:new(x, y, type)
-    TileSprite.new(self, 'bushes_big.png', type, 50, 50, x, y, -15, -15)
+    TileSprite.new(self, 'bushes_big.png', type, 55, 55, x, y, -15, -15)
 end
 
 TileBushesBananas = class(TileSprite)

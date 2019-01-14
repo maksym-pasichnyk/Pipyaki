@@ -1,7 +1,5 @@
 function invoke(self, name, ...)
-    local action = self[name]
-    
-    if action then
-        action(self, ...)
+    if self[name] then
+        self[name](self, ...)
     end
 end

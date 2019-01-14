@@ -213,19 +213,13 @@ function GraphicsItem:mousePressEvent(event)
         end
     end
 
-    self.isPressed = true
-    self.isDragging = true
+    event:accept(self)
 end
 
 function GraphicsItem:mouseClickEvent(event)
-    
 end
 
 function GraphicsItem:mouseReleaseEvent(event)
-    local pressed = self.isPressed
-    self.isPressed = false
-    self.isDragging = false
-
     for i = self.childs:size(), 1, -1 do
         local child = self.childs:get(i)
         if child:active_and_enabled() and child:contains(event.x, event.y) then
@@ -236,9 +230,7 @@ function GraphicsItem:mouseReleaseEvent(event)
         end
     end
 
-    if pressed then
-        self:mouseClickEvent(event)
-    end
+    event:accept(self)
 end
 
 function GraphicsItem:mouseMoveEvent(event)
@@ -253,13 +245,12 @@ function GraphicsItem:mouseMoveEvent(event)
     end
 end
 
-function GraphicsItem:mouseLeaveEvent()
-    self.isPressed   = false
-    self.isMouseOver = false    
+function GraphicsItem:mouseEnterEvent()
+        
 end
 
-function GraphicsItem:mouseEnterEvent()
-    self.isMouseOver = true    
+function GraphicsItem:mouseLeaveEvent()
+        
 end
 
 function GraphicsItem:keyPressEvent(event)
@@ -347,9 +338,8 @@ function GraphicsItem:joystickHatEvent(event)
 end
 
 function GraphicsItem:lostFocusEvent()
-    self.isFocused = false
+
 end
 
 function GraphicsItem:gainFocusEvent()
-    self.isFocused = true
 end

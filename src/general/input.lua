@@ -20,12 +20,11 @@ function InputEvent:new(data)
     self.accepted = false
 end
 
-function InputEvent:accept()
+function InputEvent:accept(target)
     self.accepted = true
-end
-
-function InputEvent:ignore()
-    self.accepted = false
+    if target then
+        self.target = target
+    end
 end
 
 local KeyEventType = class()

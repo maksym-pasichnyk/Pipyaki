@@ -24,8 +24,6 @@ function Checkbox:get_thumb_color()
 end
 
 function Checkbox:mouseClickEvent(event)
-    event:accept()
-
     self.value = not self.value
     self.onToggle:invoke(self)
 end

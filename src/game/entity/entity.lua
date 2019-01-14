@@ -3,6 +3,10 @@ import 'general/math/rect'
 import 'general/graphics/sprite'
 import 'general/scene/scene-manager'
 
+function make_anim(idle, index, frames, speed)
+    return { idle = idle, index = index, frames = frames, speed = speed }
+end
+
 Entity = class(Tile)
 EntityState = {
     Idle = 0,
@@ -56,6 +60,11 @@ function math.clamp(value, min, max)
     end
 
     return value
+end
+
+function Entity:is_local()
+    -- todo: network
+    return true
 end
 
 function Entity:move(direction)    

@@ -2,8 +2,8 @@ import 'general/scene/scene-manager'
 import 'game/entity/entity'
 import 'general/input'
 
-Pipyaka = class(Entity)
-function Pipyaka:new(tile_x, tile_y)
+Bombaka = class(Entity)
+function Bombaka:new(tile_x, tile_y)
     Entity.new(self, 'chars/pipyaka.png', tile_x, tile_y, 32, 30, 30)
 
     self.anims = {

@@ -30,33 +30,49 @@ function Scene:update(dt)
 end
 
 function Scene:mousepressed(x, y, button, istouch)
-    self:mousePressEvent(MouseEvent(x, y, button))
-
-    if self.focused and not self.focused:contains(x, y) then
-        self:setFocus(nil)
+    local event = MouseEvent(x, y, button)
+    self:mousePressEvent(event)
+    if event.target then
+        event.target.isPressed = true
     end
+    self.pressed = event.target
+    self:setFocus(event.target)
 end
 
 function Scene:mousereleased(x, y, button, istouch, presses)
-    self:mouseReleaseEvent(MouseEvent(x, y, button))
+    local event = MouseEvent(x, y, button)
+    self:mouseReleaseEvent(event)
+    if event.target and event.target.isPressed then
+        event.target.isPressed = false
+        event.target:mouseClickEvent(event)
+    end
+    self.pressed = nil
 end
 
 function Scene:mousemoved(x, y, dx, dy)
     local element = self:itemAt(x, y)
 
     if not rawequal(self.hovered, element) then
-        if self.hovered then
-            self.hovered:mouseLeaveEvent()
+        local hovered = self.hovered
+        if hovered then
+            hovered.isPressed   = false
+            hovered.isMouseOver = false  
+            hovered:mouseLeaveEvent()
         end
 
         self.hovered = element
 
-        if self.hovered then
-            self.hovered:mouseEnterEvent()
+        if element then
+            element.isMouseOver = true
+            element:mouseEnterEvent()
         end
     end
 
-    self:mouseMoveEvent(InputEvent { x = x, y = y, dx = dx, dy = dy })
+    if self.pressed then
+        self.pressed:mouseMoveEvent(InputEvent { x = x, y = y, dx = dx, dy = dy, drag = true })
+    else
+        self:mouseMoveEvent(InputEvent { x = x, y = y, dx = dx, dy = dy })
+    end
 end
 
 function Scene:keypressed(key, scancode, isrepeat)
@@ -93,12 +109,14 @@ function Scene:setFocus(element)
     end
 
     if self.focused then
+        self.focused.isFocused = false
         self.focused:lostFocusEvent()
     end
 
     self.focused = element
 
     if self.focused then
+        self.focused.isFocused = true
         self.focused:gainFocusEvent()
     end
 end

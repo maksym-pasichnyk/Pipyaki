@@ -52,12 +52,6 @@ function TextField:append(text)
     self.onEdit:invoke(self)
 end
 
-function TextField:mousePressEvent(event)
-    event:accept()
-
-    getScene():setFocus(self)
-end
-
 function TextField:keyPressEvent(event)
     if self.isFocused then
         local key = event.key

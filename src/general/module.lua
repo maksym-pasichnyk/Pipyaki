@@ -8,7 +8,6 @@ local table_insert  = table.insert
 local module = {
     loaded = {};
     preload = {};
-    path = love.filesystem.getRequirePath()
 }
 
 local function path_loader(name, paths, loader_func)
@@ -40,7 +39,7 @@ local function preload_loader(name)
 end
 
 local function lua_loader(name)
-    return path_loader(name, module.path, love.filesystem.load)
+    return path_loader(name, package.path, love.filesystem.load)
 end
 
 local loaders = {
@@ -48,15 +47,19 @@ local loaders = {
     lua_loader,
 }
 
+local lib = require 'libmodule'
 function module.new()
     return setmetatable({ _L = {} }, { 
         __index = function(self, key)
-            for k, env in pairs(self._L) do
-                local value = env[key]
+            local L = rawget(self, '_L')
+
+            for i = 1, #L do
+                local value = L[i].env[key]
                 if value then
                     return value
                 end
             end
+
             return _G[key]
         end
     })
@@ -64,7 +67,7 @@ end
 
 local function findchunk(name)
     local errors = {
-        string.format("module '%s' not found\n", name) 
+        string_format("module '%s' not found\n", name) 
     }
 
     for _, loader in ipairs(loaders) do
@@ -96,15 +99,22 @@ function module.load(name)
     return env
 end
 
+local function imported(L, name)
+    for i = 1, #L do
+        if L[i].name == name then
+            return true
+        end
+    end
+    return false
+end
+
 _G.module = module
 _G.import = function(name)
     local L = getfenv(2)._L
-    if not L[name] then
-        L[name] = module.load(name)
+
+    if not imported(L, name) then
+        L[#L + 1] = { name = name, env = module.load(name) }
     end
 end
--- _G.export = function(name, value)
---     _G[name] = value or getfenv(2)[name]
--- end
 
 setfenv(3, module.new())

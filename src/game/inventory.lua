@@ -63,11 +63,3 @@ function Inventory:keyPressEvent(event)
         end
     end
 end
-
-function Inventory:mousePressEvent(event)
-    event:accept()
-end
-
-function Inventory:mouseMoveEvent(event)
-    
-end

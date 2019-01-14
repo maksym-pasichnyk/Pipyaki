@@ -208,9 +208,7 @@ local function drawLayer(layer, dx, dy)
 end
 
 function Level:mouseMoveEvent(event)
-    if self.isDragging then
-        event:accept()
-
+    if event.drag then
         self.dx = self.dx + event.dx
         self.dy = self.dy + event.dy
     end
@@ -220,7 +218,7 @@ function Level:joystickPressEvent(event)
 	self.update_tiles:foreach(function(tile)
 		invoke(tile, 'joystickPressEvent', event)
 
-        if event.accept then
+        if event.accepted then
             return true
         end
 	end)
