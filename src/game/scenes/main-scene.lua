@@ -44,9 +44,6 @@ function MainScene:new()
     local x = cx - w / 2
     local y = cy - (4 * (h + space) - space) / 2
 
-    assert(Screen)
-    assert(Screen.width)
-
     self:add(Label(nil, 'Main Menu', 0, 0, Screen.width, 40))
 
     for i, entry in ipairs(menu) do

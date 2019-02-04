@@ -7,7 +7,7 @@ function TileSprite:new(path, clip, rw, rh, x, y, dx, dy, layer)
     Tile.new(self, x, y, dx, dy, layer)
 
     self.sprite = Sprite:create(path)
-    self.clip = self.sprite:add(rect(clip * rw, 0, rw, rh))
+    self.clip = self.sprite:clip(rect(clip * rw, 0, rw, rh))
 end
 
 function TileSprite:boundingRect()

@@ -137,3 +137,11 @@ function Entity:move(direction)
 
     self.direction = direction
 end
+
+function Entity:isIdle()
+    return self.state == EntityState.Idle
+end
+
+function Entity:tile()
+    return self.tile_x, self.tile_y
+end

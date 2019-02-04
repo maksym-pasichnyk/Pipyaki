@@ -13,15 +13,17 @@ function Sprite:new(texture)
 end
 
 function Sprite:add(rect, pivot, border)
-    local clip = {
+    table.insert(self.clips, self:clip(rect, pivot, border))
+end
+
+function Sprite:clip(rect, pivot, border)
+    return {
         texture = self.texture,
         rect = rect,
         pivot = pivot or vec2(0.5, 0.5),
         border = border or vec4(0, 0, 0, 0),
         quad = love.graphics.newQuad(rect.x, rect.y, rect.w, rect.h, self.texture:getDimensions())
     }
-    table.insert(self.clips, clip)
-    return clip
 end
 
 function Sprite:getWidth()

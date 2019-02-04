@@ -1,7 +1,7 @@
 package.path = package.path..';src/?.lua'
 package.cpath = package.cpath..';libs/?.so'
 
-class = require 'libclass'
+class = require 'general/class'
 
 require 'general/module'
 

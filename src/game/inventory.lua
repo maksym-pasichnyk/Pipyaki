@@ -14,6 +14,7 @@ Inventory = class(GraphicsItem)
 function Inventory:new()
     GraphicsItem.new(self)
 
+    self.current = 1
     self.w = (SIZE + SPACE) * COLUMNS + SPACE
     self.h = (SIZE + SPACE) * ROWS + SPACE
 
@@ -21,15 +22,29 @@ function Inventory:new()
     self.y = (Screen.height - self.h) * 0.5
     
     self.fragswin = Ninepath('menu/fragswin.png', 20, 40, 20, 40, self.w, self.h)
-    self.weapons = Sprite:create 'menu/weapons.png'
+    self.weapons = Sprite:create('menu/weapons.png')
     self.icons = {}
+    self.ammos = {
+        50, 0, 0, 0, 0,
+         0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0,
+    }
 
     local w = self.weapons:getWidth()
     local h = self.weapons:getHeight()
 
     for i = 0, w / h - 1 do
-        table.insert(self.icons, self.weapons:add(rect(h * i, 0, h, h), vec2(0, 0)))
+        table.insert(self.icons, self.weapons:clip(rect(h * i, 0, h, h), vec2(0, 0)))
     end
+end
+
+function Inventory:getIcon()
+    return self.icons[self.current + 5]
+end
+
+function Inventory:getAmmo()
+    return self.ammos[self.current];
 end
 
 function Inventory:resizeEvent(w, h)
@@ -40,7 +55,7 @@ end
 function Inventory:paintEvent()
     self.fragswin:render()
 
-    for i = 0, 25 - 7 do
+    for i = 0, 25 - 6 do
         local x = (i % COLUMNS) * (SIZE + SPACE) + SPACE
         local y = math.floor(i / COLUMNS) * (SIZE + SPACE) + SPACE
 
