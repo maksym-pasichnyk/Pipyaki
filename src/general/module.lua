@@ -108,13 +108,13 @@ local function imported(L, name)
 end
 
 _G.module = module
-_G.import = function(name)
-    local L = getfenv(2)._L
+-- _G.import = function(name)
+--     local L = getfenv(2)._L
 
-    if not imported(L, name) then
-        L[#L + 1] = { name = name, env = module.load(name) }
-    end
-end
--- _G.import = require
+--     if not imported(L, name) then
+--         L[#L + 1] = { name = name, env = module.load(name) }
+--     end
+-- end
+_G.import = require
 
-setfenv(3, module.new())
+-- setfenv(3, module.new())

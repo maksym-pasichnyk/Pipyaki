@@ -63,7 +63,7 @@ end
 
 function Indicator:paintEvent()
     Sprite.render(self.inventory:getIcon(), 0, 0)
-    love.graphics.printf(tostring(self.inventory:getAmmo()), -10, 12, 48 + 32, 'right')
+    love.graphics.printf(tostring(self.inventory:getCount()), -10, 12, 48 + 32, 'right')
 end
 
 GameScene = class(Scene)
@@ -148,15 +148,11 @@ function GameScene:updateEvent()
 
     if self.player:isIdle() then
         if Input:GetAnyButtonDown {'space'} then
-            if self.inventory:getAmmo() > 0 then
-                local current = self.inventory.current
-                
-                local ammo = self.inventory.ammos[current]
-                self.inventory.ammos[current] = ammo - 1
-
-                self.level.middle:add(TileWeapon(self, Mine, self.player.x, self.player.y))
-
-                -- self.level:spawn_weapon(current, self.inventory:getIcon(), self.player:tile())
+            local item = self.inventory:useItem()
+            if item then
+                if item.type == 'tile' then
+                    self.level.middle:add(TileWeapon(self, item, self.player.x, self.player.y))
+                end
             end
         end
     end
