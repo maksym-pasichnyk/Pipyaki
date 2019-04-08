@@ -1,5 +1,5 @@
 package.path = package.path..';src/?.lua'
-package.cpath = package.cpath..';libs/?.so'
+love.filesystem.setRequirePath(package.path)
 
 class = require 'general/class'
 
@@ -14,7 +14,8 @@ import 'general/timer'
 
 function love.load()
     love.keyboard.setKeyRepeat(true)
-    module.load 'game/init'
+
+    module.load('game/init')
 end
 
 function love.resize(w, h)

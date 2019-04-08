@@ -47,7 +47,6 @@ local loaders = {
     lua_loader,
 }
 
-local lib = require 'libmodule'
 function module.new()
     return setmetatable({ _L = {} }, { 
         __index = function(self, key)
@@ -116,5 +115,6 @@ _G.import = function(name)
         L[#L + 1] = { name = name, env = module.load(name) }
     end
 end
+-- _G.import = require
 
 setfenv(3, module.new())

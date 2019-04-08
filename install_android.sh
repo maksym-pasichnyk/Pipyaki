@@ -1,0 +1,1 @@
+adb install -r build/game-aligned-signed.apk
