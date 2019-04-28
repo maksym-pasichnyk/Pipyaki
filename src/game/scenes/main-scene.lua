@@ -24,7 +24,7 @@ function MainScene:new()
 
     local menu = {
         Menu('Play', function()
-            SceneManager:switch('game')
+            SceneManager.switch('game')
         end),
         Menu('Settings', function()
         
@@ -44,30 +44,10 @@ function MainScene:new()
     local x = cx - w / 2
     local y = cy - (4 * (h + space) - space) / 2
 
-    self:add(Label(nil, 'Main Menu', 0, 0, Screen.width, 40))
-
     for i, entry in ipairs(menu) do
         local button = self:add(TextButton(nil, entry.text, x, y, w, h))
         button.onClick:add(entry.action)
         y = y + h + space
-    end
-
-    local label = self:add(Label(nil, 'Hello', cx - 100, 140, 200, 30))
-    local username = self:add(TextField(nil, 'Username', '', cx - 100, 20, 200, 40))
-    local volume = self:add(Slider(nil, cx - 100, 120, 200))
-    volume.onChange:add(function (this)
-        label.text = tostring(this.value)
-    end)
-    local music = self:add(Checkbox(nil, 10, 200))
-    music.onToggle:add(function (this)
-        volume.enabled = this.value
-    end)
-end
-
-function MainScene:joystickPressEvent(event)
-    if event.button == 'b' then
-        event:accept()
-        love.event.quit()
     end
 end
 

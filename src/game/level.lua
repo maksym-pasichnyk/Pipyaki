@@ -178,9 +178,9 @@ function Level:load(path)
         end
     end
 
-    self.bottom:sort(compare_tiles)
-    self.top:sort(compare_tiles)
-    self.middle:sort(compare_tiles)
+    self.bottom:stable_sort(compare_tiles)
+    self.top:stable_sort(compare_tiles)
+    self.middle:stable_sort(compare_tiles)
 
     self.unknown = buffer:i32()
 	self.track = buffer:i8()
@@ -232,13 +232,23 @@ function Level:paintEvent()
     drawLayer(self.top, self.dx, self.dy)
 end
 
-function Level:updateEvent(dt)
-    self.update_tiles:foreach(function(tile)
-        tile:update(dt)
-    end)
+function Level:addTile(layer, entity, update)
+    layer = self[layer]
+
+    layer:add(entity)
+    layer:stable_sort(compare_tiles)
+    
+    if layer.placeEvent then
+        layer:placeEvent()
+    end
+
+    if update then
+        self.update_tiles:add(entity)
+    end
 end
 
-function Level:addEntity(entity)
-    self.middle:add(entity)
-    self.update_tiles:add(entity)
+function Level:updateEvent(dt)
+    self.update_tiles:foreach(function(tile)
+        tile:updateEvent(dt)
+    end)
 end

@@ -1,12 +1,6 @@
 import 'general/event/event-manager'
 import 'general/list'
 
-local mouse = {}
-local keys = {}
-local axis = {}
-local queue = {}
-local joysticks = List()
-
 local MouseEventType = class()
 
 InputEvent = class()
@@ -53,8 +47,6 @@ function MouseEvent:new(x, y, button, dx, dy)
     self.dy = dy
 end
 
-InputListener = EventManager()
-
 MOUSE_PRESSED  = 0
 MOUSE_RELEASED = 1
 MOUSE_MOVED    = 2
@@ -62,39 +54,35 @@ KEY_PRESSED    = 3
 KEY_RELEASED   = 4
 TEXT_INPUT     = 5
 
-JOYSTICK_ADDED   = 6
-JOYSTICK_REMOVED = 7
-
-GAMEPAD_PRESSED  = 8
-GAMEPAD_RELEASED = 9
-GAMEPAD_AXIS     = 10
-
-GAMEPAD_DEAD_ZONE = 0.15
+local mouse = {}
+local keys = {}
+local axis = {}
+local queue = {}
 
 Input = {}
-function Input:GetButtonDown(key, isrepeat)
+
+function Input.getButtonDown(key, isrepeat)
     local info = keys[key]
     return info and info.state and not info.prev and (isrepeat or not info.isrepeat)
 end
 
-function Input:GetAnyButtonDown(keys)
+function Input.getAnyButtonDown(keys, isrepeat)
     for k, key in pairs(keys) do
-        if Input:GetButtonDown(key) then
+        if Input.getButtonDown(key) then
             return true
         end
     end
-
     return false
 end
 
-function Input:GetButton(key)
+function Input.getButton(key)
     local info = keys[key]
     return info and info.state
 end
 
-function Input:GetAnyButton(keys)
+function Input.getAnyButton(keys)
     for k, key in pairs(keys) do
-        if Input:GetButton(key) then
+        if Input.getButton(key) then
             return true
         end
     end
@@ -102,14 +90,14 @@ function Input:GetAnyButton(keys)
     return false
 end
 
-function Input:GetButtonUp(key)
+function Input.getButtonUp(key)
     local info = keys[key]
     return info and not info.state and info.prev
 end
 
-function Input:GetAnyButtonUp(keys)
+function Input.getAnyButtonUp(keys)
     for k, key in pairs(keys) do
-        if Input:GetButtonUp(key) then
+        if Input.getButtonUp(key) then
             return true
         end
     end
@@ -117,36 +105,22 @@ function Input:GetAnyButtonUp(keys)
     return false
 end
 
-function Input:GetAxis(axis)
-    local name, id = axis:match("(.+)#(%d+)")
-    local joystick = self:getJoystick(tonumber(id))
-    local value = joystick and joystick:getGamepadAxis(name) or 0
-
-    if value >= GAMEPAD_DEAD_ZONE then
-        return (value - GAMEPAD_DEAD_ZONE) / (1 - GAMEPAD_DEAD_ZONE)
-    elseif value <= -GAMEPAD_DEAD_ZONE then
-        return (value + GAMEPAD_DEAD_ZONE) / (1 - GAMEPAD_DEAD_ZONE)
-    end
-
-    return 0
-end
-
-function Input:GetMouseButtonDown(button)
+function Input.getMouseButtonDown(button)
     local info = mouse[button]
     return info and info.state and not info.prev
 end
 
-function Input:GetMouseButton(button)
+function Input.getMouseButton(button)
     local info = mouse[button]
     return info and info.state
 end
 
-function Input:GetMouseButtonUp(button)
+function Input.getMouseButtonUp(button)
     local info = mouse[button]
     return info and not info.state and info.prev
 end
 
-function Input:update()
+function Input.update()
     for k, event in pairs(mouse) do
         if not event.state then
             mouse[k] = nil
@@ -187,35 +161,13 @@ function Input:update()
             local event = keys[v.key]
             event.prev = true
             event.state = false
-        elseif v.type == GAMEPAD_PRESSED then
-            local event = {}
-            event.state = true
-            keys[v.button..'#'..v.id] = event
-        elseif v.type == GAMEPAD_RELEASED then
-            local event = keys[v.button..'#'..v.id]
-            event.prev = true
-            event.state = false
-        -- elseif v.type == GAMEPAD_AXIS then
-        --     local event = {}
-        --     event.value = v.value
-        --     axis[v.axis..'#'..v.id] = event
         end
     end
 
     queue = {}
 end
 
-function Input:getJoystick(index)
-    if joysticks:empty() then
-        return nil
-    end
-
-    return joysticks:get(index)
-end
-
-function Input:mousepressed(x, y, button, istouch)
-    InputListener:invoke(MOUSE_PRESSED, x, y, button, istouch)
-
+function Input.mousepressed(x, y, button, istouch)
     table.insert(queue, {
         type = MOUSE_PRESSED,
         button = button,
@@ -225,9 +177,7 @@ function Input:mousepressed(x, y, button, istouch)
     })
 end
 
-function Input:mousereleased(x, y, button, istouch, presses)
-    InputListener:invoke(MOUSE_RELEASED, x, y, button, istouch, presses)
-
+function Input.mousereleased(x, y, button, istouch, presses)
     table.insert(queue, {
         type = MOUSE_RELEASED,
         button = button,
@@ -238,13 +188,10 @@ function Input:mousereleased(x, y, button, istouch, presses)
     })
 end
 
-function Input:mousemoved(x, y, dx, dy)
-    InputListener:invoke(MOUSE_MOVED, x, y, dx, dy)
+function Input.mousemoved(x, y, dx, dy)
 end
 
-function Input:keypressed(key, scancode, isrepeat)
-    InputListener:invoke(KEY_PRESSED, key, scancode, isrepeat)
-
+function Input.keypressed(key, scancode, isrepeat)
     table.insert(queue, {
         type = KEY_PRESSED,
         key = key,
@@ -253,75 +200,12 @@ function Input:keypressed(key, scancode, isrepeat)
     })
 end
 
-function Input:keyreleased(key)
-    InputListener:invoke(KEY_RELEASED, key)
-
+function Input.keyreleased(key)
     table.insert(queue, {
         type = KEY_RELEASED,
         key = key
     })
 end
 
-function Input:textinput(text)
-    InputListener:invoke(TEXT_INPUT, text)
-end
-
-function Input:joystickadded(joystick)
-    InputListener:invoke(JOYSTICK_ADDED, joystick)
-    joysticks:add(joystick)
-end
-
-function Input:joystickremoved(joystick)
-    InputListener:invoke(JOYSTICK_REMOVED, joystick)
-    joysticks:remove(joystick)
-end
-
-function Input:joystickpressed(joystick, button)
-    InputListener:invoke(GAMEPAD_PRESSED, joystick, button)
-
-    local id, unique = joystick:getID()
-    table.insert(queue, {
-        type = GAMEPAD_PRESSED,
-        id = id,
-        unique = unique,
-        joystick = joystick,
-        button = button
-    })
-end
-
-function Input:joystickreleased(joystick, button)
-    InputListener:invoke(GAMEPAD_RELEASED, joystick, button)
-    
-    local id, unique = joystick:getID()
-    table.insert(queue, {
-        type = GAMEPAD_RELEASED,
-        id = id,
-        unique = unique,
-        joystick = joystick,
-        button = button
-    })
-end
-
-function Input:joystickaxis(joystick, axis, value)
-    if math.abs(value) < GAMEPAD_DEAD_ZONE then
-        return
-    end
-
-    if value > 0 then
-        value = (value - GAMEPAD_DEAD_ZONE) / (1 - GAMEPAD_DEAD_ZONE)
-    elseif value < 0 then
-        value = (value + GAMEPAD_DEAD_ZONE) / (1 - GAMEPAD_DEAD_ZONE)
-    end
-
-    InputListener:invoke(GAMEPAD_AXIS, joystick, axis, value)
-
-    -- local id, unique = joystick:getID()
-    -- table.insert(queue, {
-    --     type = GAMEPAD_AXIS,
-    --     id = id,
-    --     unique = unique,
-    --     joystick = joystick,
-    --     axis = axis,
-    --     value = value
-    -- })
+function Input.textinput(text)
 end

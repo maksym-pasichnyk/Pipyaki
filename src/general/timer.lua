@@ -15,7 +15,6 @@ local function tween_collect_payload(subject, target)
 end
 
 Timer = class()
-Timer.functions = {}
 function Timer:new()
 	self.functions = {}
 end

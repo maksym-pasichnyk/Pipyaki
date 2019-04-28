@@ -14,3 +14,7 @@ function TileWeapon:new(scene, data, x, y)
     self.time = scene.timer
     self.data = data
 end
+
+function TileWeapon:updateEvent(dt)
+    
+end

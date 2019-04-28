@@ -9,19 +9,6 @@ import 'game/characters/pipyaka'
 import 'game/inventory'
 import 'game/weapons/weapons'
 
-local function getInputAxis()
-    local horizontal = Input:GetAxis 'leftx#1'
-    local vertical = Input:GetAxis 'lefty#1'
-
-    if math.abs(horizontal) > math.abs(vertical) then
-        vertical = 0
-    else
-        horizontal = 0
-    end
-
-    return horizontal, vertical
-end
-
 local maps = {
     'maps/campaign/map0.map',
     'maps/campaign/map1.map',
@@ -53,7 +40,7 @@ local maps = {
     'maps/tm_suicide.map'
 }
 
-Indicator = class(GraphicsItem)
+local Indicator = class(GraphicsItem)
 function Indicator:new(inventory)
     GraphicsItem.new(self)
     self.inventory = inventory
@@ -78,7 +65,7 @@ function GameScene:new()
 
     local tile = self.level:getPlayerSpawnTile()
     self.player = Pipyaka(tile.tile_x, tile.tile_y)
-    self.level.middle:add(self.player)
+    self.level:addTile('middle', self.player)
 
     self.inventory = Inventory()
     self.indicator = Indicator(self.inventory)
@@ -92,22 +79,6 @@ function GameScene:enter()
     self.inventory.enabled = false
 end
 
-function GameScene:joystickPressEvent(event)
-    Scene.joystickPressEvent(self, event)
-
-    if event.accepted then
-        return
-    end
-
-    if event.button == 'b' then
-        event:accept()
-        SceneManager:switch('main')
-    elseif event.button == 'y' then
-        event:accept()
-        self.inventory.enabled = not self.inventory.enabled
-    end
-end
-
 function GameScene:keyPressEvent(event)
     Scene.keyPressEvent(self, event)
 
@@ -119,7 +90,7 @@ function GameScene:keyPressEvent(event)
         local key = event.key
         if key == 'escape' then
             event:accept()
-            SceneManager:switch('main')
+            SceneManager.switch('main')
         elseif key == 'i' then
             event:accept()
             self.inventory.enabled = not self.inventory.enabled
@@ -128,30 +99,28 @@ function GameScene:keyPressEvent(event)
 end
 
 function GameScene:updateEvent()
-    local h, v = getInputAxis()
-
-    if Input:GetAnyButton {'left', 'dpleft#1', 'a'} or h < 0 then
+    if Input.getAnyButton {'left', 'a'} then
         self.player:move('left')
     end
     
-    if Input:GetAnyButton {'right', 'dpright#1', 'd'} or h > 0 then
+    if Input.getAnyButton {'right', 'd'} then
         self.player:move('right')
     end
     
-    if Input:GetAnyButton {'up', 'dpup#1', 'w'} or v < 0 then
+    if Input.getAnyButton {'up', 'w'} then
         self.player:move('up')
     end
     
-    if Input:GetAnyButton {'down', 'dpdown#1', 's'} or v > 0 then
+    if Input.getAnyButton {'down', 's'} then
         self.player:move('down')
     end
 
     if self.player:isIdle() then
-        if Input:GetAnyButtonDown {'space'} then
+        if Input.getAnyButtonDown {'space'} then
             local item = self.inventory:useItem()
             if item then
                 if item.type == 'tile' then
-                    self.level.middle:add(TileWeapon(self, item, self.player.x, self.player.y))
+                    self.level:addTile('middle', TileWeapon(self, item, self.player.x, self.player.y), true)
                 end
             end
         end

@@ -31,98 +31,75 @@ function getScene()
 end
 
 SceneManager = {}
-function SceneManager:switch(name)
+function SceneManager.switch(name)
     stack = {}
 
     startScene(name)
 end
 
-function SceneManager:push(name)
+function SceneManager.push(name)
     table.insert(stack, SceneManager.scene_name)
     startScene(name)
 end
 
-function SceneManager:pop()
+function SceneManager.pop()
     local name = stack[#stack]
     assert(name, 'Unable to pop parent scene')
     table.remove(stack)
-    SceneManager:switch(name)
+    SceneManager.switch(name)
 end
 
-function SceneManager:render()
+function SceneManager.render()
     if scene then
         scene:render()
     end
 end
 
-function SceneManager:update(dt)
+function SceneManager.update(dt)
+
     if scene then
         scene:update(dt)
     end
 end
 
-function SceneManager:resize(w, h)
+function SceneManager.resize(w, h)
     if scene then
         scene:resize(w, h)
     end
 end
 
-function SceneManager:mousepressed(x, y, button, istouch)
+function SceneManager.mousepressed(x, y, button, istouch)
     if scene then
         scene:mousepressed(x, y, button, istouch)
     end
 end
 
-function SceneManager:mousereleased(x, y, button, istouch, presses)
+function SceneManager.mousereleased(x, y, button, istouch, presses)
     if scene then
         scene:mousereleased(x, y, button, istouch, presses)
     end
 end
 
-function SceneManager:mousemoved(x, y, dx, dy)
+function SceneManager.mousemoved(x, y, dx, dy)
     if scene then
         scene:mousemoved(x, y, dx, dy)
     end
 end
 
-function SceneManager:keypressed(key, scancode, isrepeat)
+function SceneManager.keypressed(key, scancode, isrepeat)
     if scene then
         scene:keypressed(key, scancode, isrepeat)
     end
 end
 
-function SceneManager:keyreleased(key)
+function SceneManager.keyreleased(key)
     if scene then
         scene:keyreleased(key)
     end
 end
 
-function SceneManager:textinput(text)
+function SceneManager.textinput(text)
     if scene then
         scene:textinput(text)
-    end
-end
-
-function SceneManager:joystickpressed(joystick, button)
-    if scene then
-        scene:joystickpressed(joystick, button)
-    end
-end
-
-function SceneManager:joystickreleased(joystick, button)
-    if scene then
-        scene:joystickreleased(joystick, button)
-    end
-end
-
-function SceneManager:joystickaxis(joystick, axis, value)
-    if scene then
-        scene:joystickaxis(joystick, axis, value)
-    end
-end
-
-function SceneManager:joystickhat(joystick, hat, direction)
-    if scene then
-        scene:joystickhat(joystick, hat, direction)
     end
 end

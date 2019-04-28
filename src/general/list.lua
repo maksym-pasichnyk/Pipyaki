@@ -1,3 +1,62 @@
+local max_chunk_size = 72
+
+local function insertion_sort(list, first, last, predicate)
+    for i = first + 1, last do
+        local k = first
+        local v = list[i]
+        for j = i, first + 1, -1 do
+            if predicate(v, list[j-1]) then
+                list[j] = list[j-1]
+            else
+                k = j
+                break
+            end
+        end
+        list[k] = v
+    end
+end
+
+local function merge(list, workspace, low, middle, high, predicate)
+    local i, j, k
+    i = 1
+    for j = low, middle do
+        workspace[i] = list[j]
+        i = i + 1
+    end
+    i = 1
+    j = middle + 1
+    k = low
+    while true do
+        if (k >= j) or (j > high) then
+            break
+        end
+        if predicate(list[j], workspace[i]) then
+            list[k] = list[j]
+            j = j + 1
+        else
+            list[k] = workspace[i]
+            i = i + 1
+        end
+        k = k + 1
+    end
+
+    for k = k, j-1 do
+        list[k] = workspace[i]
+        i = i + 1
+    end
+end
+
+local function merge_sort(list, workspace, low, high, predicate)
+    if high - low < max_chunk_size then
+        insertion_sort(list, low, high, predicate)
+    else
+        local middle = math.floor((low + high)/2)
+        merge_sort(list, workspace, low, middle, predicate)
+        merge_sort(list, workspace, middle + 1, high, predicate)
+        merge(list, workspace, low, middle, high, predicate)
+    end
+end
+
 List = class()
 function List:new()
     self.__data = {}
@@ -67,6 +126,16 @@ end
 
 function List:sort(predicate)
     table.sort(self.__data, predicate)
+end
+
+function List:stable_sort(predicate)
+    if self.__size < 2 then 
+        table.sort(self.__data, predicate)
+    end
+
+    local workspace = {}
+    workspace[math.floor((self.__size + 1) / 2)] = self.__data[1]
+    merge_sort(self.__data, workspace, 1, self.__size, predicate)
 end
 
 function List:foreach(predicate, ...)
