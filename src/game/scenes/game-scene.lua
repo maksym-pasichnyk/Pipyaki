@@ -74,7 +74,7 @@ function GameScene:new()
 end
 
 function GameScene:spawnPlayer()
-    local tile = self.level:getPlayerSpawnTile()
+    local tile = self.level:getSpawnTile(TileSpawnPoint.Race.Pipyaka)
     self.player = Pipyaka(tile.tile_x, tile.tile_y)
     self.level:addTile('middle', self.player)
 end

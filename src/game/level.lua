@@ -188,8 +188,8 @@ function Level:load(path)
     -- collectgarbage 'collect'
 end
 
-function Level:getPlayerSpawnTile()
-    return self.spawners:find(Self.equals, TileSpawnPoint.Race.Pipyaka).value
+function Level:getSpawnTile(race)
+    return self.spawners:find(Self.equals, race).value
 end
 
 local function drawLayer(layer, bounds)
