@@ -152,6 +152,10 @@ function TileSpawnPoint:new(x, y, properties)
     self.fast_spawn = properties[11] ~= 0
 end
 
+function TileSpawnPoint:equals(race)
+    return self.race == race
+end
+
 TileStaticWeapon = class(TileSprite)
 TileStaticWeapon.Type = {
     Rake = 0,

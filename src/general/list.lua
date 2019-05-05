@@ -93,8 +93,8 @@ function List:add(value)
 end
 
 function List:contains(value)
-    for k, v in List.__iterator(self) do
-        if rawequal(v, value) then
+    for i = 1, self.__size do
+        if rawequal(self.__data[i], value) then
             return true
         end
     end
@@ -102,8 +102,8 @@ function List:contains(value)
 end
 
 function List:remove(value)
-    for i, v in List.__iterator(self) do
-        if rawequal(v, value) then
+    for i = 1, self.__size do
+        if rawequal(self.__data[i], value) then
             table.remove(self.__data, i)
             self.__size = self.__size - 1
             return
@@ -116,10 +116,11 @@ function List:clear()
     self.__size = 0
 end
 
-function List:find(predicate)
-    for i, v in List.__iterator(self) do
-        if predicate(v) then
-            return i, v
+function List:find(predicate, ...)
+    for i = 1, self.__size do
+        local v = self.__data[i]
+        if predicate(v, ...) then
+            return { key = i, value = v }
         end
     end
 end
@@ -139,8 +140,8 @@ function List:stable_sort(predicate)
 end
 
 function List:foreach(predicate, ...)
-    for i, v in List.__iterator(self) do
-        if rawequal(predicate(v, ...), true) then
+    for i = 1, self.__size do
+        if rawequal(predicate(self.__data[i], ...), true) then
             break
         end
     end
@@ -161,10 +162,11 @@ end
 
 function List:__iterator()
     local data = self.__data
+    local size = self.__size
     local i = 0
     return function()
         i = i + 1
-        if i <= self.__size then
+        if i <= size then
             return i, data[i]
         end
     end

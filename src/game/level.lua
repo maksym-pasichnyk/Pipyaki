@@ -189,10 +189,7 @@ function Level:load(path)
 end
 
 function Level:getPlayerSpawnTile()
-	local i, tile = self.spawners:find(function(tile)
-		return tile.race == TileSpawnPoint.Race.Pipyaka
-	end)
-    return tile
+    return self.spawners:find(Self.equals, TileSpawnPoint.Race.Pipyaka).value
 end
 
 local function drawLayer(layer, bounds)
@@ -236,7 +233,5 @@ function Level:addTile(layer, entity, update)
 end
 
 function Level:updateEvent(dt)
-    self.update_tiles:foreach(function(tile)
-        tile:updateEvent(dt)
-    end)
+    self.update_tiles:foreach(Self.updateEvent, dt)
 end

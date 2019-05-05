@@ -2,6 +2,7 @@ package.path = package.path..';src/?.lua'
 love.filesystem.setRequirePath(package.path)
 
 class = require 'general/class'
+Self = require 'general/self'
 
 require 'general/module'
 

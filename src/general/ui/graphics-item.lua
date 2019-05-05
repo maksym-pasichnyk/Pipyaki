@@ -23,8 +23,8 @@ function GraphicsItem:itemAt(x, y)
         local contains = self:boundingRect():contains(x, y)
 
         if not self.clip or contains then
-            for i = self.childs:size(), 1, -1 do
-                local obj = self.childs:get(i):itemAt(x, y)
+            for i = self.childs.__size, 1, -1 do
+                local obj = self.childs.__data[i]:itemAt(x, y)
 
                 if obj then
                     return obj
@@ -189,8 +189,8 @@ function GraphicsItem:reset()
     self.isMouseOver = false
     self.isFocused   = false
 
-    for i = self.childs:size(), 1, -1 do
-        self.childs:get(i):reset()
+    for i = self.childs.__size, 1, -1 do
+        self.childs.__data[i]:reset()
     end
 end
 
@@ -203,8 +203,8 @@ function GraphicsItem:contains(x, y)
 end
 
 function GraphicsItem:mousePressEvent(event)
-    for i = self.childs:size(), 1, -1 do
-        local child = self.childs:get(i)
+    for i = self.childs.__size, 1, -1 do
+        local child = self.childs.__data[i]
         if child:active_and_enabled() and child:contains(event.x, event.y) then
             child:mousePressEvent(event)
             if event.accepted then
@@ -220,8 +220,8 @@ function GraphicsItem:mouseClickEvent(event)
 end
 
 function GraphicsItem:mouseReleaseEvent(event)
-    for i = self.childs:size(), 1, -1 do
-        local child = self.childs:get(i)
+    for i = self.childs.__size, 1, -1 do
+        local child = self.childs.__data[i]
         if child:active_and_enabled() and child:contains(event.x, event.y) then
             child:mouseReleaseEvent(event)
             if event.accepted then
@@ -234,8 +234,8 @@ function GraphicsItem:mouseReleaseEvent(event)
 end
 
 function GraphicsItem:mouseMoveEvent(event)
-    for i = self.childs:size(), 1, -1 do
-        local child = self.childs:get(i)
+    for i = self.childs.__size, 1, -1 do
+        local child = self.childs.__data[i]
         if child:active_and_enabled() and child:contains(event.x, event.y) then
             child:mouseMoveEvent(event)
             if event.accepted then
@@ -254,8 +254,8 @@ function GraphicsItem:mouseLeaveEvent()
 end
 
 function GraphicsItem:keyPressEvent(event)
-    for i = self.childs:size(), 1, -1 do
-        local child = self.childs:get(i)
+    for i = self.childs.__size, 1, -1 do
+        local child = self.childs.__data[i]
         if child:active_and_enabled() then
             child:keyPressEvent(event)
             if event.accepted then
@@ -266,8 +266,8 @@ function GraphicsItem:keyPressEvent(event)
 end
 
 function GraphicsItem:keyReleaseEvent(event)
-    for i = self.childs:size(), 1, -1 do
-        local child = self.childs:get(i)
+    for i = self.childs.__size, 1, -1 do
+        local child = self.childs.__data[i]
         if child:active_and_enabled() then
             child:keyReleaseEvent(event)
             if event.accepted then
@@ -278,8 +278,8 @@ function GraphicsItem:keyReleaseEvent(event)
 end
 
 function GraphicsItem:inputTextEvent(event)
-    for i = self.childs:size(), 1, -1 do
-        local child = self.childs:get(i)
+    for i = self.childs.__size, 1, -1 do
+        local child = self.childs.__data[i]
         if child:active_and_enabled() then
             child:inputTextEvent(event)
             if event.accepted then
@@ -290,8 +290,8 @@ function GraphicsItem:inputTextEvent(event)
 end
 
 function GraphicsItem:joystickPressEvent(event)
-    for i = self.childs:size(), 1, -1 do
-        local child = self.childs:get(i)
+    for i = self.childs.__size, 1, -1 do
+        local child = self.childs.__data[i]
         if child:active_and_enabled() then
             child:joystickPressEvent(event)
             if event.accepted then
@@ -302,8 +302,8 @@ function GraphicsItem:joystickPressEvent(event)
 end
 
 function GraphicsItem:joystickReleaseEvent(event)
-    for i = self.childs:size(), 1, -1 do
-        local child = self.childs:get(i)
+    for i = self.childs.__size, 1, -1 do
+        local child = self.childs.__data[i]
         if child:active_and_enabled() then
             child:joystickReleaseEvent(event)
             if event.accepted then
@@ -314,8 +314,8 @@ function GraphicsItem:joystickReleaseEvent(event)
 end
 
 function GraphicsItem:joystickAxisEvent(event)
-    for i = self.childs:size(), 1, -1 do
-        local child = self.childs:get(i)
+    for i = self.childs.__size, 1, -1 do
+        local child = self.childs.__data[i]
         if child:active_and_enabled() then
             child:joystickAxisEvent(event)
             if event.accepted then
@@ -326,8 +326,8 @@ function GraphicsItem:joystickAxisEvent(event)
 end
 
 function GraphicsItem:joystickHatEvent(event)
-    for i = self.childs:size(), 1, -1 do
-        local child = self.childs:get(i)
+    for i = self.childs.__size, 1, -1 do
+        local child = self.childs.__data[i]
         if child:active_and_enabled() then
             child:joystickHatEvent(event)
             if event.accepted then
