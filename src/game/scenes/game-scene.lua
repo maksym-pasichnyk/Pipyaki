@@ -3,6 +3,7 @@ import 'general/input'
 import 'general/scene/scene'
 import 'general/graphics/sprite'
 import 'general/scene/scene-manager'
+import 'general/camera'
 
 import 'game/level'
 import 'game/characters/pipyaka'
@@ -57,15 +58,10 @@ GameScene = class(Scene)
 function GameScene:new()
     Scene.new(self)
 
-    self.dx = 0
-    self.dy = 0
+    self.camera = Camera()
     
     self.level = Level()
     self.level:load(maps[1])
-
-    local tile = self.level:getPlayerSpawnTile()
-    self.player = Pipyaka(tile.tile_x, tile.tile_y)
-    self.level:addTile('middle', self.player)
 
     self.inventory = Inventory()
     self.indicator = Indicator(self.inventory)
@@ -73,10 +69,27 @@ function GameScene:new()
     self:add(self.level)
     self:add(self.inventory)
     self:add(self.indicator)
+
+    self:spawnPlayer()
+end
+
+function GameScene:spawnPlayer()
+    local tile = self.level:getPlayerSpawnTile()
+    self.player = Pipyaka(tile.tile_x, tile.tile_y)
+    self.level:addTile('middle', self.player)
 end
 
 function GameScene:enter()
     self.inventory.enabled = false
+    self:updateCamera()
+end
+
+function GameScene:updateCamera()
+    local hw = Screen.width * 0.5
+    local hh = Screen.height * 0.5
+
+    self.camera.x = -math.max(0, math.min(self.player.x, (self.level.width - 1) * 30 - hw) - hw)
+    self.camera.y = -math.max(0, math.min(self.player.y, (self.level.height - 1) * 30 - hh) - hh)
 end
 
 function GameScene:keyPressEvent(event)
@@ -99,30 +112,38 @@ function GameScene:keyPressEvent(event)
 end
 
 function GameScene:updateEvent()
-    if Input.getAnyButton {'left', 'a'} then
-        self.player:move('left')
-    end
-    
-    if Input.getAnyButton {'right', 'd'} then
-        self.player:move('right')
-    end
-    
-    if Input.getAnyButton {'up', 'w'} then
-        self.player:move('up')
-    end
-    
-    if Input.getAnyButton {'down', 's'} then
-        self.player:move('down')
-    end
+    if self.inventory.enabled then
 
-    if self.player:isIdle() then
-        if Input.getAnyButtonDown {'space'} then
-            local item = self.inventory:useItem()
-            if item then
-                if item.type == 'tile' then
-                    self.level:addTile('middle', TileWeapon(self, item, self.player.x, self.player.y), true)
+    else
+        if Input.getAnyButton {'left', 'a'} then
+            self.player:move('left')
+        end
+        
+        if Input.getAnyButton {'right', 'd'} then
+            self.player:move('right')
+        end
+        
+        if Input.getAnyButton {'up', 'w'} then
+            self.player:move('up')
+        end
+        
+        if Input.getAnyButton {'down', 's'} then
+            self.player:move('down')
+        end
+    
+        if self.player:isIdle() then
+            if Input.getButtonDown('space') then
+                local item = self.inventory:useItem()
+                if item then
+                    if item.type == 'tile' then
+                        self.level:addTile('middle', TileWeapon(self, item, self.player.x, self.player.y), true)
+                    end
                 end
             end
         end
+    end
+
+    if not self.player:isIdle() then
+        self:updateCamera()
     end
 end

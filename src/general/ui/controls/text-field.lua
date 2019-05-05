@@ -61,7 +61,7 @@ function TextField:keyPressEvent(event)
         elseif key == 'escape' then
             if event:single() then
                 event:accept()
-                getScene():setFocus(nil)
+                self.scene:setFocus(nil)
             end
         end
     end

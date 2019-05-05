@@ -23,8 +23,6 @@ end
 Level = class(GraphicsItem)
 function Level:new()
     GraphicsItem.new(self)
-    self.dx = 0
-    self.dy = 0
     self:setSize(Screen.width, Screen.height)
 end
 
@@ -197,11 +195,9 @@ function Level:getPlayerSpawnTile()
     return tile
 end
 
-local function drawLayer(layer, dx, dy)
-    local r = rect(-dx, -dy, Screen.width, Screen.height)
-    
+local function drawLayer(layer, bounds)
     layer:foreach(function(tile)
-        if r:intersect(tile:boundingRect()) then
+        if bounds:intersect(tile:boundingRect()) then
             tile:render()
         end
     end)
@@ -209,27 +205,21 @@ end
 
 function Level:mouseMoveEvent(event)
     if event.drag then
-        self.dx = self.dx + event.dx
-        self.dy = self.dy + event.dy
+        self.scene.camera:move(event.dx, event.dy)
     end
 end
 
-function Level:joystickPressEvent(event)
-	self.update_tiles:foreach(function(tile)
-		invoke(tile, 'joystickPressEvent', event)
-
-        if event.accepted then
-            return true
-        end
-	end)
-end
-
 function Level:paintEvent()
-    love.graphics.translate(self.dx, self.dy)
-    drawLayer(self.ground, self.dx, self.dy)
-    drawLayer(self.bottom, self.dx, self.dy)
-    drawLayer(self.middle, self.dx, self.dy)
-    drawLayer(self.top, self.dx, self.dy)
+    self.scene.camera:beforeRenderEvent()
+
+    local r = self.scene.camera:getRect()
+
+    drawLayer(self.ground, r)
+    drawLayer(self.bottom, r)
+    drawLayer(self.middle, r)
+    drawLayer(self.top, r)
+    
+    self.scene.camera:afterRenderEvent()
 end
 
 function Level:addTile(layer, entity, update)
@@ -238,9 +228,7 @@ function Level:addTile(layer, entity, update)
     layer:add(entity)
     layer:stable_sort(compare_tiles)
     
-    if layer.placeEvent then
-        layer:placeEvent()
-    end
+    invoke(layer, 'placeEvent')
 
     if update then
         self.update_tiles:add(entity)
