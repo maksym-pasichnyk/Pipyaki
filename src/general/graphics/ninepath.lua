@@ -12,7 +12,7 @@ end
 
 Ninepath = class()
 function Ninepath:new(path, l, r, t, b, w, h)
-    local texture = AssetManager:loadTexture(path)
+    local texture = AssetManager.loadTexture(path)
     local tw, th = texture:getDimensions()
 
     local dw = w - tw

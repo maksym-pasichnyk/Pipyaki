@@ -4,7 +4,7 @@ import 'general/math/vec4'
 
 Sprite = class()
 function Sprite:create(path)
-    return Sprite(AssetManager:loadTexture(path))
+    return Sprite(AssetManager.loadTexture(path))
 end
 
 function Sprite:new(texture)

@@ -39,7 +39,7 @@ function Level:load(path)
     self.update_tiles = List()
     self.spawners = List()
 
-    local buffer = BufferStream(AssetManager:readFile(path))
+    local buffer = BufferStream(AssetManager.readFile(path))
 
     local magic = buffer:i8()
 	local type = buffer:i8()
