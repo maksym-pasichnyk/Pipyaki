@@ -213,14 +213,15 @@ function Level:paintEvent()
 
     drawLayer(self.ground, r)
     drawLayer(self.bottom, r)
+    drawLayer(self.special, r)
     drawLayer(self.middle, r)
     drawLayer(self.top, r)
     
     self.scene.camera:afterRenderEvent()
 end
 
-function Level:addTile(layer, entity, update)
-    layer = self[layer]
+function Level:addTile(layer_name, entity, update)
+    local layer = self[layer_name]
 
     layer:add(entity)
     layer:stable_sort(compare_tiles)

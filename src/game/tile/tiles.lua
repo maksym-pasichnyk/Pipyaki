@@ -106,32 +106,32 @@ function TileCactusesSmall:new(x, y, type)
 end
 
 TileSpawnPoint = class(TileSprite)
-TileSpawnPoint.Race = {
-    Pipyaka = 0,
-    Bombaka = 1,
-    Slonyaka = 2,
-    Ulityaka = 3,
-    Cannon = 4,
-    Kamikaze = 5,
-    Rocketman = 6,
-    Miner = 7,
-    Digger = 8,
-    Spider = 9
+TileSpawnPoint.Race = enum {
+    'Pipyaka',
+    'Bombaka',
+    'Slonyaka',
+    'Ulityaka',
+    'Cannon',
+    'Kamikaze',
+    'Rocketman',
+    'Miner',
+    'Digger',
+    'Spider'
 }
 
-TileSpawnPoint.Behaviour = {
-    Default = 0,
-    Blind_N_Deaf = 1,
-    Camper = 2,
-    ProtectRadius_3 = 3,
-    ProtectRadius_1 = 4
+TileSpawnPoint.Behaviour = enum {
+    'Default',
+    'Blind_N_Deaf',
+    'Camper',
+    'ProtectRadius_3',
+    'ProtectRadius_1'
 }
 
-TileSpawnPoint.Team = {
-    SinglePlayer = 0,
-    Neutral = 1,
-    Team_0 = 2,
-    Team_1 = 3
+TileSpawnPoint.Team = enum {
+    'SinglePlayer',
+    'Neutral',
+    'Team_0',
+    'Team_1'
 }
 
 function TileSpawnPoint:new(x, y, properties)
@@ -157,13 +157,13 @@ function TileSpawnPoint:equals(race)
 end
 
 TileStaticWeapon = class(TileSprite)
-TileStaticWeapon.Type = {
-    Rake = 0,
-    Bananas_Skin = 1,
-    RabberMelon_Down = 2,
-    RabberMelon_Left = 3,
-    RabberMelon_Up = 4,
-    RabberMelon_Right = 5
+TileStaticWeapon.Type = enum {
+    'Rake',
+    'Bananas_Skin',
+    'RabberMelon_Down',
+    'RabberMelon_Left',
+    'RabberMelon_Up',
+    'RabberMelon_Right'
 }
 
 function TileStaticWeapon:new(x, y, properties)
@@ -174,11 +174,11 @@ function TileStaticWeapon:new(x, y, properties)
 end
 
 TileTrampoline = class(TileSprite)
-TileTrampoline.Direction = {
-    Down = 0,
-    Left = 1,
-    Up = 2,
-    Right = 3
+TileTrampoline.Direction = enum {
+    'Down',
+    'Left',
+    'Up',
+    'Right'
 }
 
 function TileTrampoline:new(x, y, properties)
@@ -189,22 +189,23 @@ function TileTrampoline:new(x, y, properties)
 end
 
 TileItems = class(TileSprite)
-TileItems.Type = {
-    Berzerker = 0,
-    Invisibility = 1,
-    Banana = 2,
-    Sock = 3,
-    Brick = 4,
-    RabberMelon = 5,
-    ThrowableMelon = 6,
-    Carrot = 7,
-    Melon = 8,
-    Helmet = 9,
-    Pineapple = 10,
-    Bomb = 11,
-    Mine = 12,
-    Coins = 13
+TileItems.Type = enum {
+    'Berzerker',
+    'Invisibility',
+    'Banana',
+    'Sock',
+    'Brick',
+    'RabberMelon',
+    'ThrowableMelon',
+    'Carrot',
+    'Melon',
+    'Helmet',
+    'Pineapple' ,
+    'Bomb',
+    'Mine',
+    'Coins' 
 }
+
 function TileItems:new(x, y, properties)
     TileSprite.new(self, 'menu/signs.png', 0, 18, 18, x * 30, y * 30, 0, 0)
 
@@ -224,43 +225,43 @@ function TileFlagRed:new(x, y)
 end
 
 TileTrigger = class(TileSprite)
-TileTrigger.Action = {
-    None = 0,
-    TriggerToggle = 1,
-    TriggerExec = 2,
-    LevelWin = 3,
-    LevelLose = 4,
-    PointerSet = 5,
-    PointerDelete = 6,
-    Damage50 = 7,
-    TriggerExec_WO_Delay = 8,
-    SP_Active = 9,
-    SP_Deactive = 10,
-    EmitterToggle = 11,
-    WeaponSpawn = 12,
-    ItemSpawn = 13,
-    WallSpawn = 14,
-    WallRemove = 15,
-    CameraSet = 16,
-    CameraSlide = 17,
-    CameraFree = 18,
-    BotRemove = 19,
-    Counter = 20,
-    Message = 21,
-    Damage50_Silent = 22,
-    CameraSlide_Slowest = 23,
-    WeaponRemove = 24
+TileTrigger.Action = enum {
+    'None',
+    'TriggerToggle',
+    'TriggerExec',
+    'LevelWin',
+    'LevelLose',
+    'PointerSet',
+    'PointerDelete',
+    'Damage50',
+    'TriggerExec_WO_Delay',
+    'SP_Active',
+    'SP_Deactive',
+    'EmitterToggle',
+    'WeaponSpawn',
+    'ItemSpawn',
+    'WallSpawn',
+    'WallRemove',
+    'CameraSet',
+    'CameraSlide',
+    'CameraFree',
+    'BotRemove',
+    'Counter',
+    'Message',
+    'Damage50_Silent',
+    'CameraSlide_Slowest',
+    'WeaponRemove'
 }
 
-TileTrigger.Executor = {
-    Player = 0,
-    Nobody = 1,
-    Anybody = 2,
-    Teams = 3,
-    Neutrals = 4,
-    Team_0 = 5,
-    Team_1 = 6,
-    OnStart = 7
+TileTrigger.Executor = enum {
+    'Player',
+    'Nobody',
+    'Anybody',
+    'Teams',
+    'Neutrals',
+    'Team_0',
+    'Team_1',
+    'OnStart'
 }
 
 function TileTrigger:new(x, y, properties)

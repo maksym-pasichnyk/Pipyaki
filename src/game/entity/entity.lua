@@ -8,9 +8,9 @@ function make_anim(idle, index, frames, speed)
 end
 
 Entity = class(Tile)
-EntityState = {
-    Idle = 0,
-    Move = 1,
+EntityState = enum {
+    'Idle',
+    'Move',
 }
 
 function Entity:new(path, tile_x, tile_y, clips, rw, rh, anims)
