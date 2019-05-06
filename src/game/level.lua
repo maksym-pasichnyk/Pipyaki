@@ -220,19 +220,25 @@ function Level:paintEvent()
     self.scene.camera:afterRenderEvent()
 end
 
-function Level:addTile(layer_name, entity, update)
+function Level:removeTile(tile)
+    tile.level_layer:remove(tile)
+    tile.level_layer = nil
+end
+
+function Level:addTile(layer_name, tile, update)
     local layer = self[layer_name]
 
-    layer:add(entity)
+    tile.level_layer = layer
+    layer:add(tile)
     layer:stable_sort(compare_tiles)
     
-    invoke(layer, 'placeEvent')
+    invoke(tile, 'placeEvent')
 
     if update then
-        self.update_tiles:add(entity)
+        self.update_tiles:add(tile)
     end
 end
 
 function Level:updateEvent(dt)
-    self.update_tiles:foreach(Self.updateEvent, dt)
+    -- self.update_tiles:foreach(Self.updateEvent, dt)
 end

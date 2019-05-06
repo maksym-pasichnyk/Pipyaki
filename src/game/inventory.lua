@@ -10,8 +10,12 @@ local SPACE   = 10
 local COLUMNS = 5
 local ROWS    = 4
 
-local function weapon(name, sprite, x, y, count, data)
-    return { type = 'tile', name = name, sprite = sprite, size = { x = x, y = y }, count = count, data = data }
+local function weapon(name, sprite, w, h, count, explosion)
+    return { type = 'tile', name = name, sprite = sprite, size = { x = w, y = h }, count = count, explosion = explosion }
+end
+
+local function explosion(sprite, w, h, count, delay)
+    return { sprite = sprite, size = { x = w, y = h }, count = count, delay = delay }
 end
 
 local function item(name)
@@ -20,8 +24,8 @@ end
 
 Inventory = class(GraphicsItem)
 Inventory.items = {
-    weapon('melon', 'weapons/melon.png', 20, 20, 6),
-    weapon('melon_hard', 'weapons/melon_hard.png', 20, 20, 6),
+    weapon('melon', 'weapons/melon.png', 20, 20, 6, explosion('weapons/melon_explosion.png', 60, 60, 11, 4)),
+    weapon('melon_hard', 'weapons/melon_hard.png', 20, 20, 6, explosion('weapons/melon_explosion_hard.png', 60, 60, 11, 4)),
     weapon('melon_thr', 'weapons/melon_thr.png', 20, 20, 6),
     weapon('melon_thr_hard', 'weapons/melon_thr_hard.png', 20, 20, 6),
     weapon('melon_thr_hard', 'weapons/melon_thr_hard.png', 20, 20, 1),
