@@ -93,7 +93,7 @@ function Entity:move(direction)
         end
 
         self.time = 0
-        local duration = math.abs(frames) / 15
+        local duration = math.abs(frames) / 60
         self.timer:during(duration, function(dt)
             local c = func(clip + frames * math.min(self.time / duration, 1))
             self.clip = math.clamp(c - math.floor(c / 12) * 12, 0, 11) + 1

@@ -16,11 +16,30 @@ function TileWeapon:new(level, data, x, y)
 end
 
 function TileWeapon:placeEvent()
-    local explosion = self.data.explosion
+    local data = self.data.explosion
 
-    if explosion then
-        self.timer:after(explosion.delay, function()
-            self.level:removeTile(self)
+    if data then
+        local s = data.size
+        local clips = data.count
+        local frames = clips - 1
+
+        local sprite = Sprite:create(data.sprite)
+        for i = 0, frames do
+            sprite:add(rect(s.x * i, 0, s.x, s.y))
+        end
+
+        self.timer:after(data.delay, function()
+            self.sprite = sprite
+
+            local time = 0
+            local duration = clips / 60
+            self.timer:during(duration, function(dt)
+                local i = math.ceil(frames * math.min(time / duration, 1)) + 1
+                self.clip = sprite.clips[i]
+                time = time + dt
+            end, function()
+                self.level:removeTile(self)
+            end)
         end)
     end
 end
