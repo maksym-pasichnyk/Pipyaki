@@ -65,11 +65,7 @@ function Entity:is_local()
     return true
 end
 
-function Entity:move(direction)    
-    if self.state == EntityState.Move then
-        return false
-    end
-
+function Entity:move(direction)
     self.state = EntityState.Move
 
     local anim = self.anims[direction]
@@ -134,6 +130,13 @@ function Entity:move(direction)
     end
 
     self.direction = direction
+end
+
+function Entity:try_move(direction)
+    if self.state == EntityState.Move then
+        return false
+    end
+    self:move(direction)
     return true
 end
 

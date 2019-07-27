@@ -15,10 +15,10 @@ local function sprite(texture, w, h, count)
 end
 
 Inventory = class(GraphicsItem)
-Inventory.items = {
+Inventory.Item = {
     { 
         type = 'tile';
-        name = 'melon';
+        itemId = 'melon';
         sprite = sprite('weapons/melon.png', 20, 20, 6);
         delayed = {
             time = 5;
@@ -31,7 +31,7 @@ Inventory.items = {
     },
     {
         type = 'tile';
-        name = 'melon_hard';
+        itemId = 'melon_hard';
         sprite = sprite('weapons/melon_hard.png', 20, 20, 6);
         delayed = {
             time = 5;
@@ -40,90 +40,90 @@ Inventory.items = {
     },
     {
         type = 'tile';
-        name = 'melon_thr';
+        itemId = 'melon_thr';
         sprite = sprite('weapons/melon_thr.png', 20, 20, 6);
     },
     {
         type = 'tile';
-        name = 'melon_thr_hard';
+        itemId = 'melon_thr_hard';
         sprite = sprite('weapons/melon_thr_hard.png', 20, 20, 6);
     },
     {
         type = 'tile';
-        name = 'melon_thr_hard';
+        itemId = 'melon_thr_hard';
         sprite = sprite('weapons/melon_thr_hard.png', 20, 20, 1);
     },
     {
         type = 'item';
-        name = 'brick';
+        itemId = 'brick';
     },
     {
         type = 'item';
-        name = 'melon_2';
+        itemId = 'melon_2';
     },
     {
         type = 'item';
-        name = 'melon_2_hard';
+        itemId = 'melon_2_hard';
     },
     {
         type = 'item';
-        name = 'ananas';
+        itemId = 'ananas';
     },
     {
         type = 'item';
-        name = 'ananas_hard';
+        itemId = 'ananas_hard';
     },
     {
         type = 'item';
-        name = 'sock';
+        itemId = 'sock';
     },
     {
         type = 'item';
-        name = 'bananas_skin';
+        itemId = 'bananas_skin';
     },
     {
         type = 'item';
-        name = 'grabli';
+        itemId = 'grabli';
     },
     {
         type = 'item';
-        name = 'bomb';
+        itemId = 'bomb';
     },
     {
         type = 'tile';
-        name = 'mine';
+        itemId = 'mine';
         sprite = sprite('weapons/mine.png', 16, 14, 1);
     },
     {
         type = 'item';
-        name = 'bananas';
+        itemId = 'bananas';
     },
     {
         type = 'item';
-        name = 'helmet';
+        itemId = 'helmet';
     },
     {
         type = 'item';
-        name = 'invisible_helmet';
+        itemId = 'invisible_helmet';
     },
     {
         type = 'item';
-        name = 'kaska';
+        itemId = 'kaska';
     },
     {
         type = 'item';
-        name = 'carrot';
+        itemId = 'carrot';
     },
     {
         type = 'item';
-        name = 'shield';
+        itemId = 'shield';
     }
 }
 
 function Inventory:new()
     GraphicsItem.new(self)
 
-    self.current = 1
+    self.slot = 1
     self.w = (SIZE + SPACE) * COLUMNS + SPACE
     self.h = (SIZE + SPACE) * ROWS + SPACE
 
@@ -133,7 +133,7 @@ function Inventory:new()
     self.fragswin = Ninepath('menu/fragswin.png', 20, 40, 20, 40, self.w, self.h)
     self.weapons = Sprite:create('menu/weapons.png')
     self.icons = {}
-    self.counts = {50}
+    self.counts = {100}
 
     local w = self.weapons:getWidth()
     local h = self.weapons:getHeight()
@@ -143,19 +143,29 @@ function Inventory:new()
     end
 end
 
+function Inventory:getSlot(itemId)
+    for slot, item in pairs(Inventory.Item) do
+        if item.itemId == itemId then
+            return slot
+        end
+    end
+
+    return nil
+end
+
 function Inventory:getIcon()
-    return self.icons[self.current + 5]
+    return self.icons[self.slot + 5]
 end
 
 function Inventory:getCount()
-    return self.counts[self.current] or 0
+    return self.counts[self.slot] or 0
 end
 
 function Inventory:useItem()
     local count = self:getCount()
     if count > 0 then
-        self.counts[self.current] = count - 1
-        return self.items[self.current]
+        self.counts[self.slot] = count - 1
+        return self.Item[self.slot]
     end
     return nil
 end

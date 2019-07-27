@@ -146,47 +146,44 @@ function GameScene:move_camera(x, y)
     self.camera_target_y = y
 end
 
+function GameScene:pickup(tile)
+    local slot = self.inventory:getSlot(tile.itemId)
+
+    local count = self.inventory.counts[slot]
+    self.inventory.counts[slot] = count + love.math.random(10, 20)
+end
+
 function GameScene:updateEvent(dt)
     if self.inventory.enabled then
 
     else
-        if Input.getAnyButton {'left', 'a'} then
-            if self.player:move('left') then
+        if self.player:isIdle() then
+            if Input.getAnyButton {'left', 'a'} then
+                self.player:move('left')
                 self:move_camera(-60, 0)
-            end
-        end
-        
-        if Input.getAnyButton {'right', 'd'} then
-            if self.player:move('right') then
+            elseif Input.getAnyButton {'right', 'd'} then
+                self.player:move('right')
                 self:move_camera(60, 0)
-            end
-        end
-        
-        if Input.getAnyButton {'up', 'w'} then
-            if self.player:move('up') then
+            elseif Input.getAnyButton {'up', 'w'} then
+                self.player:move('up')
                 self:move_camera(0, -60)
-            end
-        end
-        
-        if Input.getAnyButton {'down', 's'} then
-            if self.player:move('down') then
+            elseif Input.getAnyButton {'down', 's'} then
+                self.player:move('down')
                 self:move_camera(0, 60)
             end
         end
-    
+
         if self.player:isIdle() then
             if Input.getButtonDown('space') then
                 local item = self.inventory:useItem()
                 if item then
                     if item.type == 'tile' then
-                        self.level:addTile('middle', TileWeapon(item, self.player.x, self.player.y), true)
+                        self.level:addTile('middle', TileWeapon(item, self.player.x, self.player.y))
                     end
                 end
             end
         end
     end
 
-    -- if not self.player:isIdle() then
-        self:updateCamera(dt)
-    -- end
+    self:updateCamera(dt)
 end

@@ -213,8 +213,8 @@ function Level:paintEvent()
 
     drawLayer(self, self.ground, r)
     drawLayer(self, self.bottom, r)
-    drawLayer(self, self.special, r)
     drawLayer(self, self.middle, r)
+    drawLayer(self, self.special, r)
     drawLayer(self, self.top, r)
     
     self.scene.camera:afterRenderEvent()
@@ -237,4 +237,19 @@ end
 
 function Level:updateEvent(dt)
     self.update_tiles:foreach(Self.updateEvent, dt)
+
+    local it = self.special:find(function(tile, player)
+        local dx = math.abs(tile.x - player.x)
+        local dy = math.abs(tile.y - player.y)
+        return dx < 5 and dy < 5
+    end, self.scene.player)
+
+    if it then
+        local tile = it.value
+
+        if tile:is(TileItems) then
+            self.scene:pickup(tile)
+            self.special:remove(tile)
+        end
+    end
 end

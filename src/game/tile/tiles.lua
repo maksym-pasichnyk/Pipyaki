@@ -1,6 +1,10 @@
 import 'game/tile/tile-sprite'
 import 'general/graphics/screen'
 
+local function sprite(texture, w, h, count)
+    return { texture = texture, w = w, h = h, count = count }
+end
+
 TileGrass = class(TileSprite)
 function TileGrass:new(type, x, y)
     TileSprite.new(self, 'ground_grass.png', type, 30, 30, x * 30, y * 30, 0, 0, 0)
@@ -231,12 +235,51 @@ TileItems.Type = enum {
     'Coins' 
 }
 
-function TileItems:new(x, y, properties)
-    TileSprite.new(self, 'menu/signs.png', 0, 18, 18, x * 30, y * 30, 0, 0)
+TileItems.ItemData = {
+    [TileItems.Type.Berzerker]      = nil,
+    [TileItems.Type.Invisibility]   = nil,
+    [TileItems.Type.Banana]         = nil,
+    [TileItems.Type.Sock]           = nil,
+    [TileItems.Type.Brick]          = nil,
+    [TileItems.Type.RabberMelon]    = nil,
+    [TileItems.Type.ThrowableMelon] = nil,
+    [TileItems.Type.Carrot]         = nil,
+    [TileItems.Type.Melon]          = {
+        itemId = 'melon',
+        sprite = sprite('weapons/melon.png', 20, 20, 6)
+    },
+    [TileItems.Type.Helmet]         = nil,
+    [TileItems.Type.Pineapple]      = nil,
+    [TileItems.Type.Bomb]           = nil,
+    [TileItems.Type.Mine]           = nil,
+    [TileItems.Type.Coins]          = nil,
+    Default                         = {
+        sprite = sprite('menu/signs.png', 18, 18, 2)
+    }
+} 
 
+function TileItems:new(x, y, properties)
     self.type = properties[1]
     self.invisible = properties[2] ~= 0
     self.spawned = properties[3] ~= 0
+    self.properties = properties
+
+    local item = TileItems.ItemData[self.type] or self.ItemData.Default
+    local data = item.sprite
+
+    TileSprite.new(self, data.texture, 0, data.w, data.h, x * 30, y * 30, 0, 0)
+
+    self.itemId = item.itemId
+
+    self.level.update_tiles:add(self)
+
+    self.time = love.math.random(math.pi * 2)
+end
+
+function TileItems:updateEvent(dt)
+    self.time = self.time + dt * 4
+
+    self.dy = -(math.sin(self.time) + 1) * 4
 end
 
 TileFlagBlue = class(TileSprite)
