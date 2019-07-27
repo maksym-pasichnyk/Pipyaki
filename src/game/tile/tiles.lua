@@ -38,21 +38,6 @@ function TileTreeCrown:new(x, y, properties)
     self.level.update_tiles:add(self)
 end
 
--- function TileTreeCrown:render()
---     local camera = self.camera
---     local hw = Screen.width * 0.5
---     local hh = Screen.height * 0.5
-
---     TileSprite.render(self)
-
---     local c = self.camera
-
---     local cx = -c.x + hw
---     local cy = -c.y + hw
-    
---     love.graphics.line(self.x, self.y, cx, cy)
--- end
-
 function TileTreeCrown:updateEvent(dt)
     local hw = Screen.width * 0.5
     local hh = Screen.height * 0.5
@@ -63,9 +48,10 @@ function TileTreeCrown:updateEvent(dt)
     local cy = -c.y + hw
 
     local ox = math.max(-10, math.min((cx - self.x) / 20, 10))
-    -- local oy = math.max(-10, math.min((cy - self.y) / 40, 10))
+    local oy = math.max(-10, math.min((cy - self.y) / 40, 10))
 
     self.dx = -ox
+    self.dy = -oy
 
     -- local dx = -self.dx - ox
     -- local dy = -self.dy - oy

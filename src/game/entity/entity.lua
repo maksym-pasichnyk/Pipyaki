@@ -67,7 +67,7 @@ end
 
 function Entity:move(direction)    
     if self.state == EntityState.Move then
-        return
+        return false
     end
 
     self.state = EntityState.Move
@@ -134,6 +134,7 @@ function Entity:move(direction)
     end
 
     self.direction = direction
+    return true
 end
 
 function Entity:isIdle()

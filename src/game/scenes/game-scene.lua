@@ -59,6 +59,9 @@ function GameScene:new()
     Scene.new(self)
 
     self.camera = Camera()
+
+    self.camera_target_x = 0
+    self.camera_target_y = 0
     
     self.level = Level()
     self.level:load(maps[1])
@@ -101,8 +104,8 @@ function GameScene:updateCamera(dt)
     local hw = Screen.width * 0.5
     local hh = Screen.height * 0.5
 
-    local x = -math.max(0, math.min(self.player.x, self.level_width - hw) - hw)
-    local y = -math.max(0, math.min(self.player.y, self.level_height - hh) - hh)
+    local x = -(self.player.x + self.camera_target_x - hw)
+    local y = -(self.player.y + self.camera_target_y - hh)
 
     self.camera.rx = x
     self.camera.ry = y
@@ -110,13 +113,13 @@ function GameScene:updateCamera(dt)
     local dx = x - self.camera.x
     local dy = y - self.camera.y
 
-    if math.abs(dx) > 31 then
+    -- if math.abs(dx) > 31 then
         self.camera.x = self.camera.x + dx * dt * 5
-    end
+    -- end
 
-    if math.abs(dy) > 31 then
+    -- if math.abs(dy) > 31 then
         self.camera.y = self.camera.y + dy * dt * 5
-    end
+    -- end
 end
 
 function GameScene:keyPressEvent(event)
@@ -138,24 +141,37 @@ function GameScene:keyPressEvent(event)
     end
 end
 
+function GameScene:move_camera(x, y)
+    self.camera_target_x = x
+    self.camera_target_y = y
+end
+
 function GameScene:updateEvent(dt)
     if self.inventory.enabled then
 
     else
         if Input.getAnyButton {'left', 'a'} then
-            self.player:move('left')
+            if self.player:move('left') then
+                self:move_camera(-60, 0)
+            end
         end
         
         if Input.getAnyButton {'right', 'd'} then
-            self.player:move('right')
+            if self.player:move('right') then
+                self:move_camera(60, 0)
+            end
         end
         
         if Input.getAnyButton {'up', 'w'} then
-            self.player:move('up')
+            if self.player:move('up') then
+                self:move_camera(0, -60)
+            end
         end
         
         if Input.getAnyButton {'down', 's'} then
-            self.player:move('down')
+            if self.player:move('down') then
+                self:move_camera(0, 60)
+            end
         end
     
         if self.player:isIdle() then
