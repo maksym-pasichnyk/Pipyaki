@@ -15,7 +15,7 @@ local function weapon(name, sprite, w, h, count, explosion)
 end
 
 local function explosion(sprite, w, h, count, delay)
-    return { sprite = sprite, size = { x = w, y = h }, count = count, delay = delay }
+    return { sprite = sprite, w = w, h = h, count = count, delay = delay }
 end
 
 local function item(name)

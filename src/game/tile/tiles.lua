@@ -1,4 +1,5 @@
 import 'game/tile/tile-sprite'
+import 'general/graphics/screen'
 
 TileGrass = class(TileSprite)
 function TileGrass:new(type, x, y)
@@ -33,6 +34,44 @@ end
 TileTreeCrown = class(TileSprite)
 function TileTreeCrown:new(x, y, properties)
     TileSprite.new(self, 'tree_crowns.png', properties[2] - 1, 105, 92, x * 30, y * 30, 0, -50)
+
+    self.level.update_tiles:add(self)
+end
+
+-- function TileTreeCrown:render()
+--     local camera = self.camera
+--     local hw = Screen.width * 0.5
+--     local hh = Screen.height * 0.5
+
+--     TileSprite.render(self)
+
+--     local c = self.camera
+
+--     local cx = -c.x + hw
+--     local cy = -c.y + hw
+    
+--     love.graphics.line(self.x, self.y, cx, cy)
+-- end
+
+function TileTreeCrown:updateEvent(dt)
+    local hw = Screen.width * 0.5
+    local hh = Screen.height * 0.5
+
+    local c = self.camera
+
+    local cx = -c.x + hw
+    local cy = -c.y + hw
+
+    local ox = math.max(-10, math.min((cx - self.x) / 20, 10))
+    -- local oy = math.max(-10, math.min((cy - self.y) / 40, 10))
+
+    self.dx = -ox
+
+    -- local dx = -self.dx - ox
+    -- local dy = -self.dy - oy
+
+    -- self.dx = self.dx + dx * dt * 10
+    -- self.dy = self.dy + dy * dt * 10
 end
 
 TileTreeShadow = class(TileSprite)

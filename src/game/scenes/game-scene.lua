@@ -92,14 +92,31 @@ function GameScene:resetCamera()
 
     self.camera.x = -math.max(0, math.min(self.player.x, self.level_width - hw) - hw)
     self.camera.y = -math.max(0, math.min(self.player.y, self.level_height - hh) - hh)
+
+    self.camera.rx = self.camera.x
+    self.camera.ry = self.camera.y
 end
 
 function GameScene:updateCamera(dt)
     local hw = Screen.width * 0.5
     local hh = Screen.height * 0.5
 
-    self.camera.x = -math.max(0, math.min(self.player.x, self.level_width - hw) - hw)
-    self.camera.y = -math.max(0, math.min(self.player.y, self.level_height - hh) - hh)
+    local x = -math.max(0, math.min(self.player.x, self.level_width - hw) - hw)
+    local y = -math.max(0, math.min(self.player.y, self.level_height - hh) - hh)
+
+    self.camera.rx = x
+    self.camera.ry = y
+
+    local dx = x - self.camera.x
+    local dy = y - self.camera.y
+
+    if math.abs(dx) > 31 then
+        self.camera.x = self.camera.x + dx * dt * 5
+    end
+
+    if math.abs(dy) > 31 then
+        self.camera.y = self.camera.y + dy * dt * 5
+    end
 end
 
 function GameScene:keyPressEvent(event)
@@ -146,14 +163,14 @@ function GameScene:updateEvent(dt)
                 local item = self.inventory:useItem()
                 if item then
                     if item.type == 'tile' then
-                        self.level:addTile('middle', TileWeapon(self.level, item, self.player.x, self.player.y), true)
+                        self.level:addTile('middle', TileWeapon(item, self.player.x, self.player.y), true)
                     end
                 end
             end
         end
     end
 
-    if not self.player:isIdle() then
+    -- if not self.player:isIdle() then
         self:updateCamera(dt)
-    end
+    -- end
 end

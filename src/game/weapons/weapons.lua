@@ -7,11 +7,9 @@ import 'game/inventory'
 local random = love.math.random
 
 TileWeapon = class(TileSprite)
-function TileWeapon:new(level, data, x, y)
+function TileWeapon:new(data, x, y)
     TileSprite.new(self, data.sprite, data.clip or random(0, data.count - 1), data.size.x, data.size.y, x, y, 0, 0, 0)
 
-    self.level = level
-    self.timer = level.scene.timer
     self.data = data
 end
 
@@ -19,13 +17,12 @@ function TileWeapon:placeEvent()
     local data = self.data.explosion
 
     if data then
-        local s = data.size
         local clips = data.count
         local frames = clips - 1
 
         local sprite = Sprite:create(data.sprite)
         for i = 0, frames do
-            sprite:add(rect(s.x * i, 0, s.x, s.y))
+            sprite:add(rect(data.w * i, 0, data.w, data.h))
         end
 
         self.timer:after(data.delay, function()

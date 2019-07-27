@@ -192,10 +192,10 @@ function Level:getSpawnTile(race)
     return self.spawners:find(Self.equals, race).value
 end
 
-local function drawLayer(layer, bounds)
+local function drawLayer(level, layer, bounds)
     layer:foreach(function(tile)
         if bounds:intersect(tile:boundingRect()) then
-            tile:render()
+            tile:render(level)
         end
     end)
 end
@@ -211,11 +211,11 @@ function Level:paintEvent()
 
     local r = self.scene.camera:getRect()
 
-    drawLayer(self.ground, r)
-    drawLayer(self.bottom, r)
-    drawLayer(self.special, r)
-    drawLayer(self.middle, r)
-    drawLayer(self.top, r)
+    drawLayer(self, self.ground, r)
+    drawLayer(self, self.bottom, r)
+    drawLayer(self, self.special, r)
+    drawLayer(self, self.middle, r)
+    drawLayer(self, self.top, r)
     
     self.scene.camera:afterRenderEvent()
 end
@@ -225,7 +225,7 @@ function Level:removeTile(tile)
     tile.level_layer = nil
 end
 
-function Level:addTile(layer_name, tile, update)
+function Level:addTile(layer_name, tile)
     local layer = self[layer_name]
 
     tile.level_layer = layer
@@ -234,11 +234,8 @@ function Level:addTile(layer_name, tile, update)
     
     invoke(tile, 'placeEvent')
 
-    if update then
-        self.update_tiles:add(tile)
-    end
 end
 
 function Level:updateEvent(dt)
-    -- self.update_tiles:foreach(Self.updateEvent, dt)
+    self.update_tiles:foreach(Self.updateEvent, dt)
 end

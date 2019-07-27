@@ -16,8 +16,6 @@ EntityState = enum {
 function Entity:new(path, tile_x, tile_y, clips, rw, rh, anims)
     Tile.new(self, 0, 0, 0, 0, 1)
 
-    self.timer = getScene().timer
-
     self.sprite = Sprite:create(path)
     self.anims = anims or {}
 
