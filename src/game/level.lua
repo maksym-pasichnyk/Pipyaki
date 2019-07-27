@@ -233,7 +233,6 @@ function Level:addTile(layer_name, tile)
     layer:stable_sort(compare_tiles)
     
     invoke(tile, 'placeEvent')
-
 end
 
 function Level:updateEvent(dt)

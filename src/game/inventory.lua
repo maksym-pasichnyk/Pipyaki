@@ -10,41 +10,114 @@ local SPACE   = 10
 local COLUMNS = 5
 local ROWS    = 4
 
-local function weapon(name, sprite, w, h, count, explosion)
-    return { type = 'tile', name = name, sprite = sprite, size = { x = w, y = h }, count = count, explosion = explosion }
-end
-
-local function explosion(sprite, w, h, count, delay)
-    return { sprite = sprite, w = w, h = h, count = count, delay = delay }
-end
-
-local function item(name)
-    return { name = name }
+local function sprite(texture, w, h, count)
+    return { texture = texture, w = w, h = h, count = count }
 end
 
 Inventory = class(GraphicsItem)
 Inventory.items = {
-    weapon('melon', 'weapons/melon.png', 20, 20, 6, explosion('weapons/melon_explosion.png', 60, 60, 11, 4)),
-    weapon('melon_hard', 'weapons/melon_hard.png', 20, 20, 6, explosion('weapons/melon_explosion_hard.png', 60, 60, 11, 4)),
-    weapon('melon_thr', 'weapons/melon_thr.png', 20, 20, 6),
-    weapon('melon_thr_hard', 'weapons/melon_thr_hard.png', 20, 20, 6),
-    weapon('melon_thr_hard', 'weapons/melon_thr_hard.png', 20, 20, 1),
-    item('brick'),
-    item('melon_2'),
-    item('melon_2_hard'),
-    item('ananas'),
-    item('ananas_hard'),
-    item('sock'),
-    item('bananas_skin'),
-    item('grabli'),
-    item('bomb'),
-    weapon('mine', 'weapons/mine.png', 16, 14, 1),
-    item('bananas'),
-    item('helmet'),
-    item('invisible_helmet'),
-    item('kaska'),
-    item('carrot'),
-    item('shield')
+    { 
+        type = 'tile';
+        name = 'melon';
+        sprite = sprite('weapons/melon.png', 20, 20, 6);
+        delayed = {
+            time = 5;
+            sprite = sprite('weapons/melon_explosion.png', 60, 60, 11);
+            trace = {
+                time = 30;
+                sprite = sprite('weapons/melon_crater.png', 35, 35, 3);
+            }
+        };
+    },
+    {
+        type = 'tile';
+        name = 'melon_hard';
+        sprite = sprite('weapons/melon_hard.png', 20, 20, 6);
+        delayed = {
+            time = 5;
+            sprite = sprite('weapons/melon_explosion_hard.png', 60, 60, 11)
+        }
+    },
+    {
+        type = 'tile';
+        name = 'melon_thr';
+        sprite = sprite('weapons/melon_thr.png', 20, 20, 6);
+    },
+    {
+        type = 'tile';
+        name = 'melon_thr_hard';
+        sprite = sprite('weapons/melon_thr_hard.png', 20, 20, 6);
+    },
+    {
+        type = 'tile';
+        name = 'melon_thr_hard';
+        sprite = sprite('weapons/melon_thr_hard.png', 20, 20, 1);
+    },
+    {
+        type = 'item';
+        name = 'brick';
+    },
+    {
+        type = 'item';
+        name = 'melon_2';
+    },
+    {
+        type = 'item';
+        name = 'melon_2_hard';
+    },
+    {
+        type = 'item';
+        name = 'ananas';
+    },
+    {
+        type = 'item';
+        name = 'ananas_hard';
+    },
+    {
+        type = 'item';
+        name = 'sock';
+    },
+    {
+        type = 'item';
+        name = 'bananas_skin';
+    },
+    {
+        type = 'item';
+        name = 'grabli';
+    },
+    {
+        type = 'item';
+        name = 'bomb';
+    },
+    {
+        type = 'tile';
+        name = 'mine';
+        sprite = sprite('weapons/mine.png', 16, 14, 1);
+    },
+    {
+        type = 'item';
+        name = 'bananas';
+    },
+    {
+        type = 'item';
+        name = 'helmet';
+    },
+    {
+        type = 'item';
+        name = 'invisible_helmet';
+    },
+    {
+        type = 'item';
+        name = 'kaska';
+    },
+    {
+        type = 'item';
+        name = 'carrot';
+    },
+    {
+        type = 'item';
+        name = 'shield';
+    }
 }
 
 function Inventory:new()
