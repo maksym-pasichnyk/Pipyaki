@@ -101,6 +101,9 @@ function GameScene:resetCamera()
 end
 
 function GameScene:updateCamera(dt)
+    if self.pressed then
+        return
+    end
     local hw = Screen.width * 0.5
     local hh = Screen.height * 0.5
 
@@ -137,6 +140,9 @@ function GameScene:keyPressEvent(event)
         elseif key == 'i' then
             event:accept()
             self.inventory.enabled = not self.inventory.enabled
+        elseif key == 'c' then
+            event:accept()
+            self.free_camera = not self.free_camera
         end
     end
 end
