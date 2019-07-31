@@ -5,6 +5,8 @@ class = require 'general/class'
 enum = require 'general/enum'
 Self = require 'general/self'
 
+debug_enable = true
+
 require 'general/module'
 
 --------------------------------------------------------
@@ -27,6 +29,11 @@ function love.resize(w, h)
 end
 
 function love.keypressed(key, scancode, isrepeat)
+    if not isrepeat then
+        if key == 'q' or key == 'Q' then
+            debug_enable = not debug_enable
+        end
+    end
     Input.keypressed(key, scancode, isrepeat)
     SceneManager.keypressed(key, scancode, isrepeat)
 end

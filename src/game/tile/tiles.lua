@@ -211,7 +211,7 @@ TileTrampoline.Direction = enum {
 }
 
 function TileTrampoline:new(x, y, properties)
-    TileSprite.new(self, 'trampoline.png', 0, 35, 35, x * 30, y * 30, 0, 0)
+    TileSprite.new(self, 'trampoline.png', 0, 40, 35, x * 30, y * 30, 0, -1)
 
     self.direction = properties[1]
     self.distance = properties[2]
@@ -333,16 +333,78 @@ TileTrigger.Executor = enum {
 }
 
 function TileTrigger:new(x, y, properties)
-    -- TileSprite.new(self, 'fx/ctf_flag.png', 1, 17, 20, x * 30, y * 30, 0, 0)
+    TileSprite.new(self, 'menu/signs.png', 0, 18, 18, x * 30, y * 30, 0, 0)
 
     self.action = properties[1]
-    self.executor = properties[2]
-    self.width = properties[3]
-    self.height = properties[4]
+    self.width = properties[2]
+    self.height = properties[3]
+    self.executor = properties[4]
     self.target_x = properties[5]
     self.target_y = properties[6]
-    self.trigger_x = properties[7]
-    self.trigger_y = properties[8]
+    self.execution_times = properties[7]
+    self.execution_delat = properties[8]
+    self.active = properties[9]
+    self.execute_at_fire = properties[10]
+    self.execute_at_use = properties[11]
+    self.activate_trigger_x = properties[12]
+    self.activate_trigger_y = properties[13]
+    self.execute_trigger = properties[14]
+    self.parameter = properties[15] -- delay?
+end
 
-    self.delay = properties[11]
+function TileTrigger:render()
+    if debug_enable then
+        local x = self.x
+        local y = self.y
+        local w = self.width * 30
+        local h = self.height * 30
+
+        local tx = x
+        local ty = y
+        
+        local ax = x
+        local ay = y
+
+        if self.target_x ~= 255 then
+            tx = self.target_x * 30
+        end
+        if self.target_y ~= 255 then
+            ty = self.target_y * 30
+        end
+
+
+        if self.activate_trigger_x ~= 255 then
+            ax = self.activate_trigger_x * 30
+        end
+        if self.activate_trigger_y ~= 255 then
+            ay = self.activate_trigger_y * 30
+        end
+
+        love.graphics.setColor({0, 0.1, 1})
+        love.graphics.rectangle('line', x - 15, y - 15, w, h, 5, 5)
+
+        if self.x ~= tx or self.y ~= ty then
+            love.graphics.line(self.x, self.y, tx, ty)
+            love.graphics.circle('line', tx, ty, 15 + 10)
+        end
+
+        if self.x ~= ax or self.y ~= ay then
+            love.graphics.setColor({0.8, 0.8, 0.8})
+            love.graphics.line(self.x, self.y, ax, ay)
+            love.graphics.circle('line', ax, ay, 10)
+        end
+
+        love.graphics.setColor({1, 1, 1})
+    end
+
+    TileSprite.render(self)
+end
+
+function TileTrigger:boundingRect()
+    local x = self.x
+    local y = self.y
+    local w = self.width * 30
+    local h = self.height * 30
+
+    return rect(x, y, w, h)
 end

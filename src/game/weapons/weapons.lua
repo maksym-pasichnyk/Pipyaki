@@ -20,31 +20,33 @@ function TileWeapon:new(item, x, y)
 end
 
 function TileWeapon:placeEvent()
-    local delayed = self.item.delayed
+    local explosion = self.item.explosion
 
-    if delayed then
-        self.timer:after(delayed.time, function()
-            self:delayedEvent(delayed.sprite)
+    if explosion then
+        self.timer:after(explosion.time, function()
+            self:explosionEvent(explosion.sprite)
 
-            local trace = delayed.trace
+            local parts = explosion.parts
+            if parts then
 
+            end
+
+            local trace = explosion.trace
             if trace then
                 local data = trace.sprite
                 local tile = TileSprite(data.texture, Clip(trace, data), data.w, data.h, self.x, self.y, 0, 0, 0)
 
-                self.level:addTile('middle', tile)
+                self.level:addTile('bottom', tile)
     
-                self.timer:after(trace.time, function()
-                    self.level:removeTile(tile)
-                end)
+                -- self.timer:after(trace.time, function()
+                    -- self.level:removeTile(tile)
+                -- end)
             end
         end)
     end
-
-    
 end
 
-function TileWeapon:delayedEvent(data)
+function TileWeapon:explosionEvent(data)
     local clips = data.count
     local frames = clips - 1
 

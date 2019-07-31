@@ -20,11 +20,14 @@ Inventory.Item = {
         type = 'tile';
         itemId = 'melon';
         sprite = sprite('weapons/melon.png', 20, 20, 6);
-        delayed = {
+        explosion = {
             time = 5;
             sprite = sprite('weapons/melon_explosion.png', 60, 60, 11);
+            parts = {
+                sprite = sprite('weapons/melon_parts.png', 20, 20, 10);
+            };
             trace = {
-                time = 30;
+                -- time = 30;
                 sprite = sprite('weapons/melon_crater.png', 35, 35, 3);
             }
         };
@@ -33,9 +36,16 @@ Inventory.Item = {
         type = 'tile';
         itemId = 'melon_hard';
         sprite = sprite('weapons/melon_hard.png', 20, 20, 6);
-        delayed = {
+        explosion = {
             time = 5;
-            sprite = sprite('weapons/melon_explosion_hard.png', 60, 60, 11)
+            sprite = sprite('weapons/melon_explosion_hard.png', 60, 60, 11);
+            parts = {
+                sprite = sprite('weapons/melon_parts_hard.png', 20, 20, 10);
+            };
+            trace = {
+                -- time = 30;
+                sprite = sprite('weapons/melon_crater.png', 35, 35, 3);
+            }
         }
     },
     {

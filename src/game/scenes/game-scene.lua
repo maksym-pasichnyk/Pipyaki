@@ -27,6 +27,15 @@ local maps = {
     'maps/campaign/map13.map',
     'maps/campaign/map14.map',
     'maps/campaign/map15.map',
+    'maps/campaign/map16.map',
+    'maps/campaign/map17.map',
+    'maps/campaign/map18.map',
+    'maps/campaign/map19.map',
+    'maps/campaign/map20.map',
+    'maps/campaign/map21.map',
+    'maps/campaign/map22.map',
+    'maps/campaign/map23.map',
+    'maps/campaign/map24.map',
 
     'maps/ctf_headphones.map',
     'maps/ctf_microscheme.map',
@@ -64,9 +73,8 @@ function GameScene:new()
     self.camera_target_y = 0
     
     self.level = Level()
-    self.level:load(maps[1])
-    self.level_width = (self.level.width - 1) * 30
-    self.level_height = (self.level.height - 1) * 30
+
+    self.level_index = 1
 
     self.inventory = Inventory()
     self.indicator = Indicator(self.inventory)
@@ -75,7 +83,16 @@ function GameScene:new()
     self:add(self.inventory)
     self:add(self.indicator)
 
+    self:startLevel()
+end
+
+function GameScene:startLevel()
+    self.level:load(maps[self.level_index])
+    self.level_width = (self.level.width - 1) * 30
+    self.level_height = (self.level.height - 1) * 30
     self:spawnPlayer()
+
+    self:resetCamera()
 end
 
 function GameScene:spawnPlayer()
@@ -93,11 +110,13 @@ function GameScene:resetCamera()
     local hw = Screen.width * 0.5
     local hh = Screen.height * 0.5
 
-    self.camera.x = -math.max(0, math.min(self.player.x, self.level_width - hw) - hw)
-    self.camera.y = -math.max(0, math.min(self.player.y, self.level_height - hh) - hh)
+    self.camera.x = -self.player.x + hw
+    self.camera.y = -self.player.y + hh
 
     self.camera.rx = self.camera.x
     self.camera.ry = self.camera.y
+
+    self:move_camera(0, 0)
 end
 
 function GameScene:updateCamera(dt)
@@ -143,6 +162,15 @@ function GameScene:keyPressEvent(event)
         elseif key == 'c' then
             event:accept()
             self.free_camera = not self.free_camera
+        elseif key == ',' then
+            self.level_index = self.level_index - 1
+            if self.level_index == 0 then
+                self.level_index = 34
+            end
+            self:startLevel()
+        elseif key == '.' then
+            self.level_index = self.level_index % 34 + 1
+            self:startLevel()
         end
     end
 end
@@ -191,5 +219,7 @@ function GameScene:updateEvent(dt)
         end
     end
 
-    self:updateCamera(dt)
+    if not self.free_camera then
+        self:updateCamera(dt)
+    end
 end

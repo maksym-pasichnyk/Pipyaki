@@ -24,13 +24,7 @@ Level = class(GraphicsItem)
 function Level:new()
     GraphicsItem.new(self)
     self:setSize(Screen.width, Screen.height)
-end
 
-function Level:resizeEvent(w, h)
-    self:setSize(w, h)
-end
-
-function Level:load(path)
     self.ground = List()
     self.bottom = List()
     self.middle = List()
@@ -38,27 +32,27 @@ function Level:load(path)
     self.special = List()
     self.update_tiles = List()
     self.spawners = List()
+    self.triggers = List()
+end
 
-    local buffer = BufferStream(AssetManager.readFile(path))
+function Level:resizeEvent(w, h)
+    self:setSize(w, h)
+end
 
-    local magic = buffer:i8()
-	local type = buffer:i8()
-    local version = buffer:i32()
+function Level:loadLite()
+    error('not implemented')
+end
 
-    local width = buffer:i8()
-    local height = buffer:i8()
+function Level:loadFull()
+    local width = self.width
+    local height = self.height
 
-    self.width = width
-    self.height = height
-    
     local size = width * height
 
-    local data = BufferStream(buffer:read(buffer:i32()))
-    
-    while data:__boolean() do
-        local layer = data:i8()
+    local data = self.layers_data
 
-        if layer == 0 then
+    local layer_parsers = {
+        [0] = function()
             local buf = { data:read(size):byte(1, -1) }
 
             local i = 1
@@ -70,7 +64,8 @@ function Level:load(path)
                     i = i + 1
                 end
             end
-        elseif layer == 1 then
+        end;
+        [1] = function()
             local buf = { data:read(size):byte(1, -1) }
 
             local i = 1
@@ -82,7 +77,8 @@ function Level:load(path)
                     i = i + 1
                 end
             end
-        elseif layer == 2 then
+        end;
+        [2] = function()
             local count = data:i16()
 
             for i = 1, count do
@@ -91,7 +87,7 @@ function Level:load(path)
                 local type = data:i8()
 
                 if type ~= 0xFF then 
-                    local properties = { data:read(3):byte(1, -1) }
+                    local properties = { data:read(2):byte(1, -1) }
 
                     if type == 0 then
                         self.middle:add(TileWall(tile_x, tile_y, properties))
@@ -106,7 +102,7 @@ function Level:load(path)
                         self.bottom:add(TileTreeShadow(tile_x, tile_y))
                         self.middle:add(TileTreeStubs(tile_x, tile_y, properties))
                         if properties[2] > 1 then
-                           self.top:add(TileTreeCrown(tile_x, tile_y, properties))
+                            self.top:add(TileTreeCrown(tile_x, tile_y, properties))
                         end
                     elseif type == 5 then
                         self.middle:add(TileWell(tile_x, tile_y, properties))
@@ -117,13 +113,14 @@ function Level:load(path)
                     end
                 end
             end
-        elseif layer == 3 then
+        end;
+        [3] = function()
             local count = data:i32()
 
-			for i = 1, count do
-				local x = data:i16()
-				local y = data:i16()
-				local type = data:i8()
+            for i = 1, count do
+                local x = data:i16()
+                local y = data:i16()
+                local type = data:i8()
                 local subtype = data:i8()
 
                 if type == 0 then
@@ -142,21 +139,27 @@ function Level:load(path)
                     self.bottom:add(TileCactusesSmall(x, y, subtype))
                 end
             end
-        elseif layer == 4 then
-            local count = data:i16()
+        end;
+        [4] = function()
+            local count = data:i32()
 
             for i = 1, count do
                 local type = data:i8()
                 local tile_x = data:i8()
                 local tile_y = data:i8()
-                local properties = { data:read(16):byte(1, -1) }
+                local properties
+                
+                local params_count = data:i8()
+                if params_count > 0 then
+                    properties = { data:read(params_count):byte(1, -1) }
+                end
 
                 if type == 0 then
                     self.spawners:add(TileSpawnPoint(tile_x, tile_y, properties))
                 elseif type == 1 then
                     self.special:add(TileStaticWeapon(tile_x, tile_y, properties))
                 elseif type == 2 then
-                    self.special:add(TileTrampoline(tile_x, tile_y, properties))
+                    self.middle:add(TileTrampoline(tile_x, tile_y, properties))
                 elseif type == 3 then
                     self.special:add(TileItems(tile_x, tile_y, properties))
                 elseif type == 4 then
@@ -164,28 +167,60 @@ function Level:load(path)
                 elseif type == 5 then
                     self.special:add(TileFlagRed(tile_x, tile_y))
                 elseif type == 6 then
-                    print ('death zone', unpack(properties))
+                    -- self.special:add(TileDeathZone(tile_x, tile_y))
                 elseif type == 7 then
-                    -- print ('trigger\t', 'tile_x = '..tile_x, 'tile_y = '..tile_y, unpack(properties))
+                    self.triggers:add(TileTrigger(tile_x, tile_y, properties))
                 elseif type == 8 then
-                    print ('particles', unpack(properties))
+                    -- self.triggers:add(TileParticle(tile_x, tile_y, properties))
                 end
             end
-        else
-            break
         end
+    }
+    
+    while data:__boolean() do
+        layer_parsers[data:i8()]()
     end
+end
 
-    self.bottom:stable_sort(compare_tiles)
-    self.top:stable_sort(compare_tiles)
-    self.middle:stable_sort(compare_tiles)
+function Level.loadBuffer(path)
+    return BufferStream(AssetManager.readFile(path))
+end
 
-    self.unknown = buffer:i32()
+function Level:load(path)
+    self.ground:clear()
+    self.bottom:clear()
+    self.middle:clear()
+    self.top:clear()
+    self.special:clear()
+    self.update_tiles:clear()
+    self.spawners:clear()
+    self.triggers:clear()
+
+    local buffer = Level.loadBuffer(path)
+
+    local magic = buffer:i8()
+	local format = buffer:i8()
+    local version = buffer:i32()
+    self.width = buffer:i8()
+    self.height = buffer:i8()
+
+    self.layers_data = BufferStream(buffer:read(buffer:i32()))
+
+    local params_count = buffer:i32()
 	self.track = buffer:i8()
 	self.difficulty = buffer:i8()
     self.intro = buffer:i8()
     
-    -- collectgarbage 'collect'
+    local loaders = {
+        Level.loadLite, 
+        Level.loadFull 
+    }
+    
+    loaders[format](self)
+
+    self.bottom:stable_sort(compare_tiles)
+    self.top:stable_sort(compare_tiles)
+    self.middle:stable_sort(compare_tiles)
 end
 
 function Level:getSpawnTile(race)
@@ -195,7 +230,7 @@ end
 local function drawLayer(level, layer, bounds)
     layer:foreach(function(tile)
         if bounds:intersect(tile:boundingRect()) then
-            tile:render(level)
+            tile:render()
         end
     end)
 end
@@ -216,6 +251,7 @@ function Level:paintEvent()
     drawLayer(self, self.middle, r)
     drawLayer(self, self.special, r)
     drawLayer(self, self.top, r)
+    drawLayer(self, self.triggers, r)
     
     self.scene.camera:afterRenderEvent()
 end
