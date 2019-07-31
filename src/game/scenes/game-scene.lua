@@ -54,8 +54,13 @@ local Indicator = class(GraphicsItem)
 function Indicator:new(inventory)
     GraphicsItem.new(self)
     self.inventory = inventory
-    self.x = Screen.width - 48 - 32
-    self.y = Screen.height - 48
+
+    self:resizeEvent(Screen.width, Screen.height)
+end
+
+function Indicator:resizeEvent(w, h)
+    self.x = w - 48 - 32
+    self.y = h - 48
 end
 
 function Indicator:paintEvent()

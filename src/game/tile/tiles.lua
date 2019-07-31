@@ -37,7 +37,7 @@ end
 
 TileTreeCrown = class(TileSprite)
 function TileTreeCrown:new(x, y, properties)
-    TileSprite.new(self, 'tree_crowns.png', properties[2] - 1, 105, 92, x * 30, y * 30, 0, -50)
+    TileSprite.new(self, 'tree_crowns.png', properties[2] - 1, 105, 92, x * 30, y * 30, 0, -50, 1)
 
     self.level.update_tiles:add(self)
 end
@@ -342,7 +342,7 @@ function TileTrigger:new(x, y, properties)
     self.target_x = properties[5]
     self.target_y = properties[6]
     self.execution_times = properties[7]
-    self.execution_delat = properties[8]
+    self.execution_delay = properties[8]
     self.active = properties[9]
     self.execute_at_fire = properties[10]
     self.execute_at_use = properties[11]
@@ -350,6 +350,10 @@ function TileTrigger:new(x, y, properties)
     self.activate_trigger_y = properties[13]
     self.execute_trigger = properties[14]
     self.parameter = properties[15] -- delay?
+end
+
+function TileTrigger:isAutoTrigger()
+    return self.execution_delay ~= 0
 end
 
 function TileTrigger:render()
@@ -372,7 +376,6 @@ function TileTrigger:render()
             ty = self.target_y * 30
         end
 
-
         if self.activate_trigger_x ~= 255 then
             ax = self.activate_trigger_x * 30
         end
@@ -380,31 +383,28 @@ function TileTrigger:render()
             ay = self.activate_trigger_y * 30
         end
 
-        love.graphics.setColor({0, 0.1, 1})
-        love.graphics.rectangle('line', x - 15, y - 15, w, h, 5, 5)
+        local action = self.action
 
-        if self.x ~= tx or self.y ~= ty then
-            love.graphics.line(self.x, self.y, tx, ty)
-            love.graphics.circle('line', tx, ty, 15 + 10)
+        if action == TileTrigger.Action.PointerSet and self:isAutoTrigger() then
+            love.graphics.circle('line', x, y, 15)
         end
 
-        if self.x ~= ax or self.y ~= ay then
-            love.graphics.setColor({0.8, 0.8, 0.8})
-            love.graphics.line(self.x, self.y, ax, ay)
-            love.graphics.circle('line', ax, ay, 10)
-        end
+        -- love.graphics.setColor({0, 0.1, 1})
+        -- love.graphics.rectangle('line', x - 15, y - 15, w, h, 5, 5)
+
+        -- if self.x ~= tx or self.y ~= ty then
+        --     love.graphics.line(self.x, self.y, tx, ty)
+        --     love.graphics.circle('line', tx, ty, 15 + 10)
+        -- end
+
+        -- if self.x ~= ax or self.y ~= ay then
+        --     love.graphics.setColor({0.8, 0.8, 0.8})
+        --     love.graphics.line(self.x, self.y, ax, ay)
+        --     love.graphics.circle('line', ax, ay, 10)
+        -- end
 
         love.graphics.setColor({1, 1, 1})
     end
 
     TileSprite.render(self)
-end
-
-function TileTrigger:boundingRect()
-    local x = self.x
-    local y = self.y
-    local w = self.width * 30
-    local h = self.height * 30
-
-    return rect(x, y, w, h)
 end
