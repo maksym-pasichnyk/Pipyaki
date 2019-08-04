@@ -164,18 +164,20 @@ function GameScene:keyPressEvent(event)
         elseif key == 'i' then
             event:accept()
             self.inventory.enabled = not self.inventory.enabled
-        elseif key == 'c' then
-            event:accept()
-            self.free_camera = not self.free_camera
-        elseif key == ',' then
-            self.level_index = self.level_index - 1
-            if self.level_index == 0 then
-                self.level_index = 34
+        elseif debug_enable then
+            if key == 'c' then
+                event:accept()
+                self.free_camera = not self.free_camera
+            elseif key == ',' then
+                self.level_index = self.level_index - 1
+                if self.level_index == 0 then
+                    self.level_index = 34
+                end
+                self:startLevel()
+            elseif key == '.' then
+                self.level_index = self.level_index % 34 + 1
+                self:startLevel()
             end
-            self:startLevel()
-        elseif key == '.' then
-            self.level_index = self.level_index % 34 + 1
-            self:startLevel()
         end
     end
 end
