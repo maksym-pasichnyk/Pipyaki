@@ -182,7 +182,7 @@ function Level:loadFull()
     end
 end
 
-function Level.loadBuffer(path)
+local function loadBuffer(path)
     return BufferStream(AssetManager.readFile(path))
 end
 
@@ -196,7 +196,7 @@ function Level:load(path)
     self.spawners:clear()
     self.triggers:clear()
 
-    local buffer = Level.loadBuffer(path)
+    local buffer = loadBuffer(path)
 
     local magic = buffer:i8()
 	local format = buffer:i8()
@@ -213,7 +213,7 @@ function Level:load(path)
     
     local loaders = {
         Level.loadLite, 
-        Level.loadFull 
+        Level.loadFull
     }
     
     loaders[format](self)

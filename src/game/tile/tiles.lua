@@ -135,7 +135,7 @@ function TileCactusesSmall:new(x, y, type)
 end
 
 TileSpawnPoint = class(TileSprite)
-TileSpawnPoint.Race = enum {
+SpawnRace = enum {
     'Pipyaka',
     'Bombaka',
     'Slonyaka',
@@ -148,7 +148,7 @@ TileSpawnPoint.Race = enum {
     'Spider'
 }
 
-TileSpawnPoint.Behaviour = enum {
+SpawnBehaviour = enum {
     'Default',
     'Blind_N_Deaf',
     'Camper',
@@ -156,7 +156,7 @@ TileSpawnPoint.Behaviour = enum {
     'ProtectRadius_1'
 }
 
-TileSpawnPoint.Team = enum {
+SpawnTeam = enum {
     'SinglePlayer',
     'Neutral',
     'Team_0',
@@ -186,7 +186,7 @@ function TileSpawnPoint:equals(race)
 end
 
 TileStaticWeapon = class(TileSprite)
-TileStaticWeapon.Type = enum {
+StaticWeaponType = enum {
     'Rake',
     'Bananas_Skin',
     'RabberMelon_Down',
@@ -203,7 +203,7 @@ function TileStaticWeapon:new(x, y, properties)
 end
 
 TileTrampoline = class(TileSprite)
-TileTrampoline.Direction = enum {
+TrampolineDirection = enum {
     'Down',
     'Left',
     'Up',
@@ -218,7 +218,7 @@ function TileTrampoline:new(x, y, properties)
 end
 
 TileItems = class(TileSprite)
-TileItems.Type = enum {
+ItemType = enum {
     'Berzerker',
     'Invisibility',
     'Banana',
@@ -236,23 +236,23 @@ TileItems.Type = enum {
 }
 
 TileItems.ItemData = {
-    [TileItems.Type.Berzerker]      = nil,
-    [TileItems.Type.Invisibility]   = nil,
-    [TileItems.Type.Banana]         = nil,
-    [TileItems.Type.Sock]           = nil,
-    [TileItems.Type.Brick]          = nil,
-    [TileItems.Type.RabberMelon]    = nil,
-    [TileItems.Type.ThrowableMelon] = nil,
-    [TileItems.Type.Carrot]         = nil,
-    [TileItems.Type.Melon]          = {
+    [ItemType.Berzerker]      = nil,
+    [ItemType.Invisibility]   = nil,
+    [ItemType.Banana]         = nil,
+    [ItemType.Sock]           = nil,
+    [ItemType.Brick]          = nil,
+    [ItemType.RabberMelon]    = nil,
+    [ItemType.ThrowableMelon] = nil,
+    [ItemType.Carrot]         = nil,
+    [ItemType.Melon]          = {
         itemId = 'melon',
         sprite = sprite('weapons/melon.png', 20, 20, 6)
     },
-    [TileItems.Type.Helmet]         = nil,
-    [TileItems.Type.Pineapple]      = nil,
-    [TileItems.Type.Bomb]           = nil,
-    [TileItems.Type.Mine]           = nil,
-    [TileItems.Type.Coins]          = nil,
+    [ItemType.Helmet]         = nil,
+    [ItemType.Pineapple]      = nil,
+    [ItemType.Bomb]           = nil,
+    [ItemType.Mine]           = nil,
+    [ItemType.Coins]          = nil,
     Default                         = {
         sprite = sprite('menu/signs.png', 18, 18, 2)
     }
@@ -293,7 +293,7 @@ function TileFlagRed:new(x, y)
 end
 
 TileTrigger = class(TileSprite)
-TileTrigger.Action = enum {
+TriggerAction = enum {
     'None',
     'TriggerToggle',
     'TriggerExec',
@@ -321,7 +321,7 @@ TileTrigger.Action = enum {
     'WeaponRemove'
 }
 
-TileTrigger.Executor = enum {
+TriggerExecutor = enum {
     'Player',
     'Nobody',
     'Anybody',
@@ -385,23 +385,23 @@ function TileTrigger:render()
 
         local action = self.action
 
-        if action == TileTrigger.Action.PointerSet and self:isAutoTrigger() then
+        if action == TriggerAction.PointerSet and self:isAutoTrigger() then
             love.graphics.circle('line', x, y, 15)
         end
 
-        -- love.graphics.setColor({0, 0.1, 1})
-        -- love.graphics.rectangle('line', x - 15, y - 15, w, h, 5, 5)
+        love.graphics.setColor({0, 0.1, 1})
+        love.graphics.rectangle('line', x - 15, y - 15, w, h, 5, 5)
 
-        -- if self.x ~= tx or self.y ~= ty then
-        --     love.graphics.line(self.x, self.y, tx, ty)
-        --     love.graphics.circle('line', tx, ty, 15 + 10)
-        -- end
+        if self.x ~= tx or self.y ~= ty then
+            love.graphics.line(self.x, self.y, tx, ty)
+            love.graphics.circle('line', tx, ty, 15 + 10)
+        end
 
-        -- if self.x ~= ax or self.y ~= ay then
-        --     love.graphics.setColor({0.8, 0.8, 0.8})
-        --     love.graphics.line(self.x, self.y, ax, ay)
-        --     love.graphics.circle('line', ax, ay, 10)
-        -- end
+        if self.x ~= ax or self.y ~= ay then
+            love.graphics.setColor({0.8, 0.8, 0.8})
+            love.graphics.line(self.x, self.y, ax, ay)
+            love.graphics.circle('line', ax, ay, 10)
+        end
 
         love.graphics.setColor({1, 1, 1})
     end

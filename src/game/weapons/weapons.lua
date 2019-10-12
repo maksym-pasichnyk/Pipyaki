@@ -58,7 +58,7 @@ function TileWeapon:explosionEvent(data)
     self.sprite = sprite
 
     local time = 0
-    local duration = clips / 60
+    local duration = clips / 30
     self.timer:during(duration, function(dt)
         local i = math.ceil(frames * math.min(time / duration, 1)) + 1
         self.clip = sprite.clips[i]

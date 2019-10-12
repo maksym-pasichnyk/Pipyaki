@@ -79,8 +79,6 @@ function GameScene:new()
     
     self.level = Level()
 
-    self.level_index = 1
-
     self.inventory = Inventory()
     self.indicator = Indicator(self.inventory)
 
@@ -88,11 +86,12 @@ function GameScene:new()
     self:add(self.inventory)
     self:add(self.indicator)
 
-    self:startLevel()
+    self:startLevel(1)
 end
 
-function GameScene:startLevel()
-    self.level:load(maps[self.level_index])
+function GameScene:startLevel(index)
+    self.level_index = index
+    self.level:load(maps[index])
     self.level_width = (self.level.width - 1) * 30
     self.level_height = (self.level.height - 1) * 30
     self:spawnPlayer()
@@ -101,7 +100,7 @@ function GameScene:startLevel()
 end
 
 function GameScene:spawnPlayer()
-    local tile = self.level:getSpawnTile(TileSpawnPoint.Race.Pipyaka)
+    local tile = self.level:getSpawnTile(SpawnRace.Pipyaka)
     self.player = Pipyaka(tile.tile_x, tile.tile_y)
     self.level:addTile('middle', self.player)
 end
@@ -169,14 +168,13 @@ function GameScene:keyPressEvent(event)
                 event:accept()
                 self.free_camera = not self.free_camera
             elseif key == ',' then
-                self.level_index = self.level_index - 1
-                if self.level_index == 0 then
-                    self.level_index = 34
+                local index = self.level_index - 1
+                if index == 0 then
+                    index = 34
                 end
-                self:startLevel()
+                self:startLevel(index)
             elseif key == '.' then
-                self.level_index = self.level_index % 34 + 1
-                self:startLevel()
+                self:startLevel(self.level_index % 34 + 1)
             end
         end
     end
