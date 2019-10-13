@@ -170,7 +170,6 @@ function Item:use()
 end
 
 local items = {}
-
 function Inventory:new(scene)
     GraphicsItem.new(self, scene)
     self.ignore_self_touches = false
@@ -192,6 +191,7 @@ function Inventory:new(scene)
         table.insert(self.icons, self.weapons:clip(rect(h * i, 0, h, h), vec2(0, 0)))
     end
 
+    items = {}
     for i = 0, 25 - 6 do
         local item = Item(self, i + 1, self.icons[i + 6], self.icons[5], item_table[i + 1])
         item:set(1)
@@ -203,8 +203,6 @@ function Inventory:new(scene)
 
         table.insert(items, item)
     end
-
-    items[1]:set(100)
 end
 
 function Inventory:selectSlot(slot)

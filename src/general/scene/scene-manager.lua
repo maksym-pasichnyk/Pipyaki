@@ -1,6 +1,7 @@
 local scene = nil
 local stack = {}
 local scenes = {}
+local scene_name = nil
 
 function addScene(name, path, type)
     scenes[name] = module.load(path)[type]
@@ -12,14 +13,10 @@ function startScene(name)
         scene = nil
     end
     
-    SceneManager.scene_name = name
+    scene_name = name
 
     if name then
-        local Scene = scenes[name]
-        assert (Scene, 'Unable to find scene: '..name)
-
-        scene = setmetatable({}, Scene)
-        scene:new()
+        scene = scenes[name]()
 
         scene:enter()
         scene.entered = true
@@ -38,13 +35,12 @@ function SceneManager.switch(name)
 end
 
 function SceneManager.push(name)
-    table.insert(stack, SceneManager.scene_name)
+    table.insert(stack, scene_name)
     startScene(name)
 end
 
 function SceneManager.pop()
     local name = stack[#stack]
-    assert(name, 'Unable to pop parent scene')
     table.remove(stack)
     SceneManager.switch(name)
 end

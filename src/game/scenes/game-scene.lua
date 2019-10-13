@@ -81,10 +81,19 @@ function GameScene:new()
     self.level = Level(self)
     self.inventory = Inventory(self)
     self.indicator = Indicator(self)
+    self.default_item = self.inventory:getItemById('melon')
+end
 
-    self.inventory:selectSlot(1)
+function GameScene:enter()
+    Scene.reset(self)
+    
+    self.default_item:set(100)
+    self.inventory:selectSlot(self.default_item.slot)
 
     self:startLevel(1)
+
+    self.inventory.enabled = false
+    self:resetCamera()
 end
 
 function GameScene:OnItemChange(item)
@@ -105,11 +114,6 @@ function GameScene:spawnPlayer()
     local tile = self.level:getSpawnTile(SpawnRace.Pipyaka)
     self.player = Pipyaka(tile.tile_x, tile.tile_y)
     self.level:addTile('middle', self.player)
-end
-
-function GameScene:enter()
-    self.inventory.enabled = false
-    self:resetCamera()
 end
 
 function GameScene:resetCamera()
