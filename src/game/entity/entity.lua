@@ -65,11 +65,13 @@ function Entity:is_local()
     return true
 end
 
-function Entity:move(direction)
-    self.state = EntityState.Move
-
-    local anim = self.anims[direction]
+function Entity:move(direction, walk)
     if self.direction ~= direction then
+        self.direction = direction
+        
+        local anim = self.anims[direction]
+        self.state = EntityState.Move
+
         local clip = self.clip - 1
         local idle = anim.idle
 
@@ -96,7 +98,10 @@ function Entity:move(direction)
             self.clip = anim.idle + 1
             self.state = EntityState.Idle
         end)
-    else
+    elseif walk then
+        local anim = self.anims[direction]
+        self.state = EntityState.Move
+
         local target
         if direction == 'left' then
             self.tile_x = self.tile_x - 1
@@ -128,8 +133,6 @@ function Entity:move(direction)
             self.state = EntityState.Idle
         end
     end
-
-    self.direction = direction
 end
 
 function Entity:try_move(direction)

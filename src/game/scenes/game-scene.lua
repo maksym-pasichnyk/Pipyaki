@@ -86,7 +86,7 @@ end
 
 function GameScene:enter()
     Scene.reset(self)
-    
+
     self.default_item:set(100)
     self.inventory:selectSlot(self.default_item.slot)
 
@@ -123,24 +123,15 @@ function GameScene:resetCamera()
     self.camera.x = -self.player.x + hw
     self.camera.y = -self.player.y + hh
 
-    self.camera.rx = self.camera.x
-    self.camera.ry = self.camera.y
-
     self:move_camera(0, 0)
 end
 
 function GameScene:updateCamera(dt)
-    if self.level.dragging then
-        return
-    end
     local hw = Screen.width * 0.5
     local hh = Screen.height * 0.5
 
     local x = -(self.player.x + self.camera_target_x - hw)
     local y = -(self.player.y + self.camera_target_y - hh)
-
-    self.camera.rx = x
-    self.camera.ry = y
 
     local dx = x - self.camera.x
     local dy = y - self.camera.y
@@ -205,25 +196,17 @@ function GameScene:updateEvent(dt)
         local player = self.player
         if player:isIdle() then
             if Input.getAnyButton {'left', 'a'} then
-                if self.level:canWalk(player.tile_x - 1, player.tile_y) then
-                    player:move('left')
-                    self:move_camera(-60, 0)
-                end
+                player:move('left', self.level:canWalk(player.tile_x - 1, player.tile_y))
+                self:move_camera(-60, 0)
             elseif Input.getAnyButton {'right', 'd'} then
-                if self.level:canWalk(player.tile_x + 1, player.tile_y) then
-                    player:move('right')
-                    self:move_camera(60, 0)
-                end
+                player:move('right', self.level:canWalk(player.tile_x + 1, player.tile_y))
+                self:move_camera(60, 0)
             elseif Input.getAnyButton {'up', 'w'} then
-                if self.level:canWalk(player.tile_x, player.tile_y - 1) then
-                    player:move('up')
-                    self:move_camera(0, -60)
-                end    
+                player:move('up', self.level:canWalk(player.tile_x, player.tile_y - 1))
+                self:move_camera(0, -60)
             elseif Input.getAnyButton {'down', 's'} then
-                if self.level:canWalk(player.tile_x, player.tile_y + 1) then
-                    player:move('down')
-                    self:move_camera(0, 60)
-                end
+                player:move('down', self.level:canWalk(player.tile_x, player.tile_y + 1))
+                self:move_camera(0, 60)
             end
         end
 
@@ -240,7 +223,9 @@ function GameScene:updateEvent(dt)
         end
     end
 
-    if not self.free_camera then
-        self:updateCamera(dt)
+    if self.free_camera or self.level.dragging then
+        return
     end
+
+    self:updateCamera(dt)
 end
