@@ -12,16 +12,12 @@ function Scene:new()
     self.timer = Timer()
 end
 
-function Scene:destroy()
-
-end
-
 function Scene:enter()
     self:reset()
 end
 
-function Scene:exit()
-
+function Scene:leave()
+    self.timer:clear()
 end
 
 function Scene:update(dt)
@@ -40,13 +36,14 @@ function Scene:mousepressed(x, y, button, istouch)
 end
 
 function Scene:mousereleased(x, y, button, istouch, presses)
-    local event = MouseEvent(x, y, button)
-    self:mouseReleaseEvent(event)
-    if event.target and event.target.isPressed then
-        event.target.isPressed = false
-        event.target:mouseClickEvent(event)
+    local pressed = self.pressed
+    if pressed then
+        local event = MouseEvent(x, y, button)
+        event.click = pressed.isPressed
+        pressed.isPressed = false
+        pressed:mouseReleaseEvent(event)
+        self.pressed = nil
     end
-    self.pressed = nil
 end
 
 function Scene:mousemoved(x, y, dx, dy)

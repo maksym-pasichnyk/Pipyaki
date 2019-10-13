@@ -52,14 +52,15 @@ function MainScene:new()
 end
 
 function MainScene:keyPressEvent(event)
-    Scene.keyPressEvent(self, event)
+    if Scene.keyPressEvent(self, event) then
+        return true
+    end
     
-    if event.accepted or not event:single() then
-        return
+    if event:single() then
+        if event.key == 'escape' then
+            love.event.quit()
+            return true
+        end
     end
-
-    if event.key == 'escape' then
-        event:accept()
-        love.event.quit()
-    end
+    return false
 end

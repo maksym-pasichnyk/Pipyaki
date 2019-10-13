@@ -57,19 +57,21 @@ function TextField:keyPressEvent(event)
         local key = event.key
         if key == 'backspace' then
             self:removeLast()
-            event:accept()
+            return true
         elseif key == 'escape' then
             if event:single() then
-                event:accept()
                 self.scene:setFocus(nil)
+                return true
             end
         end
     end
+    return false
 end
 
 function TextField:inputTextEvent(event)
     if self.isFocused then
         self:append(event.text)
-        event:accept()
+        return true
     end
+    return false
 end

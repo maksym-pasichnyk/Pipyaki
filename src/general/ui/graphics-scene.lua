@@ -9,14 +9,12 @@ function GraphicsScene:new()
 end
 
 function GraphicsScene:add(child)
-    child.scene = self
-    self.childs:add(child)
+    child:setParent(self)
     return child
 end
 
 function GraphicsScene:remove(child)
-    child.scene = nil
-    self.childs:remove(child)
+    child:setParent(nil)
 end
 
 function GraphicsScene:resizeEvent(w, h)

@@ -96,10 +96,6 @@ function Timer:cancel(handle)
 	self.functions[handle] = nil
 end
 
-function Timer:clear()
-	self.functions = {}
-end
-
 function Timer:script(f)
 	local co = coroutine.wrap(f)
 	co(function(t)
@@ -108,8 +104,9 @@ function Timer:script(f)
 	end)
 end
 
-function Timer:destroy()
+function Timer:clear()
 	for k, v in pairs(self.functions) do
 		self.functions[k] = nil
 	end
+	self.functions = {}
 end

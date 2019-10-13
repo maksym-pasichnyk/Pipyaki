@@ -10,15 +10,6 @@ function InputEvent:new(data)
             self[k] = v
         end
     end
-
-    self.accepted = false
-end
-
-function InputEvent:accept(target)
-    self.accepted = true
-    if target then
-        self.target = target
-    end
 end
 
 local KeyEventType = class()

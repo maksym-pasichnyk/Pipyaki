@@ -51,10 +51,8 @@ local maps = {
 }
 
 local Indicator = class(GraphicsItem)
-function Indicator:new(inventory)
-    GraphicsItem.new(self)
-    self.inventory = inventory
-
+function Indicator:new(scene)
+    GraphicsItem.new(self, scene)
     self:resizeEvent(Screen.width, Screen.height)
 end
 
@@ -64,8 +62,11 @@ function Indicator:resizeEvent(w, h)
 end
 
 function Indicator:paintEvent()
-    Sprite.render(self.inventory:getIcon(), 0, 0)
-    love.graphics.printf(tostring(self.inventory:getCount()), -10, 12, 48 + 32, 'right')
+    local item = self.item
+    if item then
+        Sprite.render(item.icon, 0, 0)
+        love.graphics.printf(tostring(item.count), -10, 12, 48 + 32, 'right')
+    end
 end
 
 GameScene = class(Scene)
@@ -77,16 +78,17 @@ function GameScene:new()
     self.camera_target_x = 0
     self.camera_target_y = 0
     
-    self.level = Level()
+    self.level = Level(self)
+    self.inventory = Inventory(self)
+    self.indicator = Indicator(self)
 
-    self.inventory = Inventory()
-    self.indicator = Indicator(self.inventory)
-
-    self:add(self.level)
-    self:add(self.inventory)
-    self:add(self.indicator)
+    self.inventory:selectSlot(1)
 
     self:startLevel(1)
+end
+
+function GameScene:OnItemChange(item)
+    self.indicator.item = item
 end
 
 function GameScene:startLevel(index)
@@ -124,7 +126,7 @@ function GameScene:resetCamera()
 end
 
 function GameScene:updateCamera(dt)
-    if self.pressed then
+    if self.level.dragging then
         return
     end
     local hw = Screen.width * 0.5
@@ -149,35 +151,37 @@ function GameScene:updateCamera(dt)
 end
 
 function GameScene:keyPressEvent(event)
-    Scene.keyPressEvent(self, event)
-
-    if event.accepted then
-        return
+    if Scene.keyPressEvent(self, event) then
+        return true
     end
 
     if event:single() then
         local key = event.key
         if key == 'escape' then
-            event:accept()
             SceneManager.switch('main')
+            return true
         elseif key == 'i' then
-            event:accept()
             self.inventory.enabled = not self.inventory.enabled
+            return true
         elseif debug_enable then
             if key == 'c' then
-                event:accept()
                 self.free_camera = not self.free_camera
+                return true
             elseif key == ',' then
                 local index = self.level_index - 1
                 if index == 0 then
                     index = 34
                 end
                 self:startLevel(index)
+                return true
             elseif key == '.' then
                 self:startLevel(self.level_index % 34 + 1)
+                return true
             end
         end
+        return false
     end
+    return false
 end
 
 function GameScene:move_camera(x, y)
@@ -186,38 +190,46 @@ function GameScene:move_camera(x, y)
 end
 
 function GameScene:pickup(tile)
-    local slot = self.inventory:getSlot(tile.itemId)
-
-    local count = self.inventory.counts[slot]
-    self.inventory.counts[slot] = count + love.math.random(10, 20)
+    local item = self.inventory:getItemById(tile.itemId)
+    item.count = item.count + love.math.random(10, 20)
 end
 
 function GameScene:updateEvent(dt)
     if self.inventory.enabled then
 
     else
-        if self.player:isIdle() then
+        local player = self.player
+        if player:isIdle() then
             if Input.getAnyButton {'left', 'a'} then
-                self.player:move('left')
-                self:move_camera(-60, 0)
+                if self.level:canWalk(player.tile_x - 1, player.tile_y) then
+                    player:move('left')
+                    self:move_camera(-60, 0)
+                end
             elseif Input.getAnyButton {'right', 'd'} then
-                self.player:move('right')
-                self:move_camera(60, 0)
+                if self.level:canWalk(player.tile_x + 1, player.tile_y) then
+                    player:move('right')
+                    self:move_camera(60, 0)
+                end
             elseif Input.getAnyButton {'up', 'w'} then
-                self.player:move('up')
-                self:move_camera(0, -60)
+                if self.level:canWalk(player.tile_x, player.tile_y - 1) then
+                    player:move('up')
+                    self:move_camera(0, -60)
+                end    
             elseif Input.getAnyButton {'down', 's'} then
-                self.player:move('down')
-                self:move_camera(0, 60)
+                if self.level:canWalk(player.tile_x, player.tile_y + 1) then
+                    player:move('down')
+                    self:move_camera(0, 60)
+                end
             end
         end
 
-        if self.player:isIdle() then
+        if player:isIdle() then
             if Input.getButtonDown('space') then
-                local item = self.inventory:useItem()
-                if item then
-                    if item.type == 'tile' then
-                        self.level:addTile('middle', TileWeapon(item, self.player.x, self.player.y))
+                local item = self.inventory.item
+                if item and item:use() then
+                    local data = item.data
+                    if data.type == 'tile' then
+                        self.level:addTile('middle', TileWeapon(data, self.player.x, self.player.y))
                     end
                 end
             end

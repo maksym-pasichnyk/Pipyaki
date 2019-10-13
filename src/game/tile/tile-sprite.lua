@@ -6,7 +6,7 @@ TileSprite = class(Tile)
 function TileSprite:new(path, clip, rw, rh, x, y, dx, dy, layer)
     Tile.new(self, x, y, dx, dy, layer)
 
-    self.sprite = Sprite:create(path)
+    self.sprite = Sprite.create(path)
     self.clip = self.sprite:clip(rect(clip * rw, 0, rw, rh))
     self.dx = 0
     self.dy = 0

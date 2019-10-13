@@ -15,7 +15,7 @@ local function sprite(texture, w, h, count)
 end
 
 Inventory = class(GraphicsItem)
-Inventory.Item = {
+local item_table = {
     { 
         type = 'tile';
         itemId = 'melon';
@@ -26,8 +26,7 @@ Inventory.Item = {
             parts = {
                 sprite = sprite('weapons/melon_parts.png', 20, 20, 10);
             };
-            trace = {
-                -- time = 30;
+            decal = {
                 sprite = sprite('weapons/melon_crater.png', 35, 35, 3);
             }
         };
@@ -42,11 +41,14 @@ Inventory.Item = {
             parts = {
                 sprite = sprite('weapons/melon_parts_hard.png', 20, 20, 10);
             };
-            trace = {
-                -- time = 30;
+            decal = {
                 sprite = sprite('weapons/melon_crater.png', 35, 35, 3);
             }
         }
+    },
+    {
+        type = 'item';
+        itemId = 'brick';
     },
     {
         type = 'tile';
@@ -57,15 +59,6 @@ Inventory.Item = {
         type = 'tile';
         itemId = 'melon_thr_hard';
         sprite = sprite('weapons/melon_thr_hard.png', 20, 20, 6);
-    },
-    {
-        type = 'tile';
-        itemId = 'melon_thr_hard';
-        sprite = sprite('weapons/melon_thr_hard.png', 20, 20, 1);
-    },
-    {
-        type = 'item';
-        itemId = 'brick';
     },
     {
         type = 'item';
@@ -130,10 +123,58 @@ Inventory.Item = {
     }
 }
 
-function Inventory:new()
-    GraphicsItem.new(self)
+local Item = class(GraphicsItem)
+function Item:new(inventory, slot, icon, disable_icon, data)
+    GraphicsItem.new(self, inventory)
+    self.slot = slot
+    self.icon = icon
+    self.disable_icon = disable_icon
+    self.data = data
+    self.count = 0
+    self.active = false
+end
 
-    self.slot = 1
+function Item:paintEvent()
+    if self.count > 0 then
+        Sprite.render(self.icon, 0, 0)
+        love.graphics.printf(tostring(self.count), -40, 27, 48 + 32, 'right')
+    else
+        Sprite.render(self.disable_icon, 0, 0)
+    end
+end
+
+function Item:mousePressEvent(event)
+    self.parent:selectSlot(self.slot)
+    return true
+end
+
+function Item:set(count)
+    self.count = count
+
+    if count > 0 then
+        self.active = true
+    end
+end
+
+function Item:add(count)
+    self:set(self.count + count)
+end
+
+function Item:use()
+    if self.count > 0 then
+        self.count = self.count - 1
+        self.parent:updateSlot(self.slot)
+        return true
+    end
+    return false
+end
+
+local items = {}
+
+function Inventory:new(scene)
+    GraphicsItem.new(self, scene)
+    self.ignore_self_touches = false
+
     self.w = (SIZE + SPACE) * COLUMNS + SPACE
     self.h = (SIZE + SPACE) * ROWS + SPACE
 
@@ -141,9 +182,8 @@ function Inventory:new()
     self.y = (Screen.height - self.h) * 0.5
     
     self.fragswin = Ninepath('menu/fragswin.png', 20, 40, 20, 40, self.w, self.h)
-    self.weapons = Sprite:create('menu/weapons.png')
+    self.weapons = Sprite.create('menu/weapons.png')
     self.icons = {}
-    self.counts = {100}
 
     local w = self.weapons:getWidth()
     local h = self.weapons:getHeight()
@@ -151,31 +191,62 @@ function Inventory:new()
     for i = 0, w / h - 1 do
         table.insert(self.icons, self.weapons:clip(rect(h * i, 0, h, h), vec2(0, 0)))
     end
+
+    for i = 0, 25 - 6 do
+        local item = Item(self, i + 1, self.icons[i + 6], self.icons[5], item_table[i + 1])
+        item:set(1)
+        
+        item.x = (i % COLUMNS) * (SIZE + SPACE) + SPACE
+        item.y = math.floor(i / COLUMNS) * (SIZE + SPACE) + SPACE
+        item.w = h
+        item.h = h
+
+        table.insert(items, item)
+    end
+
+    items[1]:set(100)
 end
 
-function Inventory:getSlot(itemId)
-    for slot, item in pairs(Inventory.Item) do
-        if item.itemId == itemId then
+function Inventory:selectSlot(slot)
+    local item = slot and items[slot] or nil
+    self.slot = slot
+    self.item = item
+    self.parent:OnItemChange(item)
+end
+
+function Inventory:getAvailableItem()
+    for slot, item in ipairs(items) do
+        if item.count > 0 then
             return slot
+        end
+    end
+    return nil
+end
+
+function Inventory:updateSlot(slot)
+    local item = items[slot]
+    if item.count == 0 then
+        item.active = false
+        if item.slot == slot then
+            self:selectSlot(self:getAvailableItem())
+        end
+    end
+end
+
+function Inventory:getItemById(itemId)
+    for slot, item in ipairs(items) do
+        if item.data.itemId == itemId then
+            return item
         end
     end
 
     return nil
 end
 
-function Inventory:getIcon()
-    return self.icons[self.slot + 5]
-end
-
-function Inventory:getCount()
-    return self.counts[self.slot] or 0
-end
-
-function Inventory:useItem()
-    local count = self:getCount()
-    if count > 0 then
-        self.counts[self.slot] = count - 1
-        return self.Item[self.slot]
+function Inventory:getSlotById(itemId)
+    local item = self:getItemById(itemId)
+    if item then
+        return item.slot
     end
     return nil
 end
@@ -187,27 +258,23 @@ end
 
 function Inventory:paintEvent()
     self.fragswin:render()
-
-    for i = 0, 25 - 6 do
-        local x = (i % COLUMNS) * (SIZE + SPACE) + SPACE
-        local y = math.floor(i / COLUMNS) * (SIZE + SPACE) + SPACE
-
-        Sprite.render(self.icons[i + 6], x, y)
-    end
 end
 
-function Inventory:joystickPressEvent(event)
-    if event.button == 'b' then
-        self.enabled = false
-        event:accept()
+function Inventory:paintAfterChilds()
+    if self.item then
+        if self.item.count > 0 then
+            local i = self.item.slot - 1
+            local x = (i % COLUMNS) * (SIZE + SPACE) + SPACE
+            local y = math.floor(i / COLUMNS) * (SIZE + SPACE) + SPACE
+            Sprite.render(self.icons[1], x, y)
+        end
     end
 end
 
 function Inventory:keyPressEvent(event)
-    if event:single() then
-        if event.key == 'escape' then
-            self.enabled = false
-            event:accept()
-        end
+    local key = event.key
+    if key == 'escape' or key == 'i' then
+        self.enabled = false
     end
+    return true
 end

@@ -10,6 +10,7 @@ function Button:new(parent, x, y, w, h)
     self:setXY(x, y)
     self:setSize(w, h)
     self.onClick = Event()
+    self.ignore_self_touches = false
 end
 
 function Button:get_background_color()
@@ -24,13 +25,15 @@ end
 
 function Button:paintEvent()
     love.graphics.setColor(self:get_background_color())
-    love.graphics.rectangle('fill', 0, 0, self.w, self.h, 4, 4)    
+    love.graphics.rectangle('fill', 0, 0, self.w, self.h, 4, 4)
 end
 
 function Button:updateEvent(dt)
 
 end
 
-function Button:mouseClickEvent(event)
-    self.onClick:invoke(self, event.x, event.y)
+function Button:mouseReleaseEvent(event)
+    if event.click then 
+        self.onClick:invoke(self, event.x, event.y)
+    end
 end

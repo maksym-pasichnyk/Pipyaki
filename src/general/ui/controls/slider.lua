@@ -41,21 +41,21 @@ function Slider:setValue(value)
 end
 
 function Slider:mousePressEvent(event)
-    GraphicsItem.mousePressEvent(self, event)
-
-    if event.target == self then
-        local x = self:mapFromScene(event.x, 0)
-        self:setValue(math.min(self.w, math.max(0, x)) / self.w)
+    if GraphicsItem.mousePressEvent(self, event) then
+        return true
     end
+
+    local x = self:mapFromScene(event.x, 0)
+    self:setValue(math.min(self.w, math.max(0, x)) / self.w)
+    return true
 end
 
 function Slider:mouseMoveEvent(event)
     if event.drag then
-        event:accept()
-
         local x = self:mapFromScene(event.x, 0)
         self:setValue(math.min(self.w, math.max(0, x)) / self.w)
-    else
-        GraphicsItem.mouseMoveEvent(self, event)
+        return true
     end
+    
+    return GraphicsItem.mouseMoveEvent(self, event)
 end

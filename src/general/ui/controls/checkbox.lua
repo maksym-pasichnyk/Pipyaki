@@ -23,7 +23,9 @@ function Checkbox:get_thumb_color()
     return {200/255, 200/255, 200/255}
 end
 
-function Checkbox:mouseClickEvent(event)
-    self.value = not self.value
-    self.onToggle:invoke(self)
+function Checkbox:mouseReleaseEvent(event)
+    if event.click then
+        self.value = not self.value
+        self.onToggle:invoke(self)
+    end
 end

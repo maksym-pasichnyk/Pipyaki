@@ -21,10 +21,12 @@ local function compare_tiles(a, b)
 end
 
 Level = class(GraphicsItem)
-function Level:new()
-    GraphicsItem.new(self)
+function Level:new(scene)
+    GraphicsItem.new(self, scene)
     self:setSize(Screen.width, Screen.height)
+    self.ignore_self_touches = false
 
+    -- todo: make layers as GraphicsItem
     self.ground = List()
     self.bottom = List()
     self.middle = List()
@@ -40,7 +42,17 @@ function Level:resizeEvent(w, h)
 end
 
 function Level:loadLite()
-    error('not implemented')
+    error("function 'Level:loadLite' is not implemented")
+end
+
+function Level:addCollision(x, y)
+    local i = y * self.width + x
+    self.collision[i] = (self.collision[i] or 0) + 1
+end
+
+function Level:removeCollision(x, y)
+    local i = x * width + y
+    self.collision[i] = self.collision[i] - 1
 end
 
 function Level:loadFull()
@@ -90,21 +102,36 @@ function Level:loadFull()
                     local properties = { data:read(2):byte(1, -1) }
 
                     if type == 0 then
+                        self:addCollision(tile_x, tile_y)
                         self.middle:add(TileWall(tile_x, tile_y, properties))
                     elseif type == 1 then
+                        self:addCollision(tile_x, tile_y)
                         self.middle:add(TileWoodWall(tile_x, tile_y, properties))
                     elseif type == 2 then
+                        self:addCollision(tile_x, tile_y)
+                        self:addCollision(tile_x + 2, tile_y)
                         self.middle:add(TileGates(tile_x, tile_y, properties))
                     elseif type == 3 then
+                        self:addCollision(tile_x + 0, tile_y)
+                        self:addCollision(tile_x + 1, tile_y)
+                        self:addCollision(tile_x + 2, tile_y)
+
+                        self:addCollision(tile_x + 0, tile_y + 1)
+                        self:addCollision(tile_x + 2, tile_y + 1)
+
+                        self:addCollision(tile_x + 0, tile_y + 2)
+                        self:addCollision(tile_x + 2, tile_y + 2)
                         self.middle:add(TileHouseBottom(tile_x, tile_y))
                         self.top:add(TileHouseTop(tile_x, tile_y))
                     elseif type == 4 then
+                        self:addCollision(tile_x, tile_y)
                         self.bottom:add(TileTreeShadow(tile_x, tile_y))
                         self.middle:add(TileTreeStubs(tile_x, tile_y, properties))
                         if properties[2] > 1 then
                             self.top:add(TileTreeCrown(tile_x, tile_y, properties))
                         end
                     elseif type == 5 then
+                        self:addCollision(tile_x, tile_y)
                         self.middle:add(TileWell(tile_x, tile_y, properties))
                     elseif type == 6 then
                         -- self.middle:add(TileTent(tile_x, tile_y, properties))
@@ -122,6 +149,8 @@ function Level:loadFull()
                 local y = data:i16()
                 local type = data:i8()
                 local subtype = data:i8()
+                local tile_x = math.floor(x / 30)
+                local tile_y = math.floor(y / 30)
 
                 if type == 0 then
                     self.bottom:add(TileStones20(x, y, subtype))
@@ -130,8 +159,10 @@ function Level:loadFull()
                 elseif type == 2 then
                     self.middle:add(TileBushesBig(x, y, subtype))
                 elseif type == 3 then
+                    self:addCollision(tile_x, tile_y)
                     self.middle:add(TileBushesBananas(x, y, subtype))
                 elseif type == 4 then
+                    self:addCollision(tile_x, tile_y)
                     self.middle:add(TileTelegaBricks(x, y, subtype))
                 elseif type == 5 then
                     self.middle:add(TileRidge(x, y, subtype))
@@ -205,6 +236,7 @@ function Level:load(path)
     self.height = buffer:i8()
 
     self.layers_data = BufferStream(buffer:read(buffer:i32()))
+    self.collision = {}
 
     local params_count = buffer:i32()
 	self.track = buffer:i8()
@@ -223,11 +255,31 @@ function Level:load(path)
     self.middle:stable_sort(compare_tiles)
 end
 
+function Level:canWalk(x, y)
+    if x < 0 or x > self.width -1 or y < 0 or y > self.height - 1 then
+        return false
+    end
+    return (self.collision[y * self.width + x] or 0) == 0
+end
+
 function Level:getSpawnTile(race)
     return self.spawners:find(Self.equals, race).value
 end
 
-local function drawLayer(level, layer, bounds)
+function Level:mouseMoveEvent(event)
+    if event.drag then
+        self.dragging = true
+        self.parent.camera:move(event.dx, event.dy)
+        return true
+    end
+    return false
+end
+
+function Level:mouseReleaseEvent(event)
+    self.dragging = false
+end
+
+local function draw(level, layer, bounds)
     layer:foreach(function(tile)
         if bounds:intersect(tile:boundingRect()) then
             tile:render()
@@ -235,28 +287,24 @@ local function drawLayer(level, layer, bounds)
     end)
 end
 
-function Level:mouseMoveEvent(event)
-    if event.drag then
-        self.scene.camera:move(event.dx, event.dy)
-    end
-end
-
 function Level:paintEvent()
-    self.scene.camera:beforeRenderEvent()
+    self.parent.camera:beforeRenderEvent()
 
-    local r = self.scene.camera:getRect()
+    local bounds = self.parent.camera:getRect()
 
-    drawLayer(self, self.ground, r)
-    drawLayer(self, self.bottom, r)
-    drawLayer(self, self.middle, r)
-    drawLayer(self, self.special, r)
-    drawLayer(self, self.top, r)
-    drawLayer(self, self.triggers, r)
+    draw(self, self.ground, bounds)
+    draw(self, self.bottom, bounds)
+    draw(self, self.middle, bounds)
+    draw(self, self.special, bounds)
+    draw(self, self.top, bounds)
+    draw(self, self.triggers, bounds)
     
-    self.scene.camera:afterRenderEvent()
+    self.parent.camera:afterRenderEvent()
 end
 
 function Level:removeTile(tile)
+    invoke(tile, 'OnDestroy', self)
+
     tile.level_layer:remove(tile)
     tile.level_layer = nil
 end
@@ -268,7 +316,7 @@ function Level:addTile(layer_name, tile)
     layer:add(tile)
     layer:stable_sort(compare_tiles)
     
-    invoke(tile, 'placeEvent')
+    invoke(tile, 'OnCreate', self)
 end
 
 function Level:updateEvent(dt)
@@ -278,13 +326,13 @@ function Level:updateEvent(dt)
         local dx = math.abs(tile.x - player.x)
         local dy = math.abs(tile.y - player.y)
         return dx < 5 and dy < 5
-    end, self.scene.player)
+    end, self.parent.player)
 
     if it then
         local tile = it.value
 
         if tile:is(TileItems) then
-            self.scene:pickup(tile)
+            self.parent:pickup(tile)
             self.special:remove(tile)
         end
     end

@@ -9,7 +9,7 @@ function GraphicsItem:new(parent)
     self.visible = true
     self.enabled = true
     self.active = true
-
+    self.ignore_self_touches = true
     self.x = 0
     self.y = 0
     self.w = 0
@@ -24,7 +24,7 @@ function GraphicsItem:itemAt(x, y)
 
         if not self.clip or contains then
             for i = self.childs.__size, 1, -1 do
-                local obj = self.childs.__data[i]:itemAt(x, y)
+                local obj = self.childs.__data[i]:itemAt(self.x + x, self.y + y)
 
                 if obj then
                     return obj
@@ -142,14 +142,11 @@ function GraphicsItem:render()
         if clip then
             intersectScissor(boundingRect.x, boundingRect.y, boundingRect.w, boundingRect.h)
         end
-
         local color = { love.graphics.getColor() }
 
         love.graphics.push()
         love.graphics.translate(self.x, self.y)
         invoke(self, 'paintEvent')
-        love.graphics.pop()
-
         love.graphics.setColor(color)
 
         self.childs:foreach(function(child)
@@ -157,6 +154,9 @@ function GraphicsItem:render()
                 child:render()
             end
         end)
+        invoke(self, 'paintAfterChilds')
+        love.graphics.setColor(color)
+        love.graphics.pop()
 
         if clip then
             setScissor(unpack(scissors))
@@ -203,46 +203,38 @@ function GraphicsItem:contains(x, y)
 end
 
 function GraphicsItem:mousePressEvent(event)
+    local x, y = self:mapFromScene(event.x, event.y)
     for i = self.childs.__size, 1, -1 do
         local child = self.childs.__data[i]
-        if child:active_and_enabled() and child:contains(event.x, event.y) then
-            child:mousePressEvent(event)
-            if event.accepted then
-                return
+        if child:active_and_enabled() and child:contains(x, y) then
+            if child:mousePressEvent(event) then
+                return true
             end
         end
     end
 
-    event:accept(self)
-end
+    if self.ignore_self_touches then
+        return false
+    end
 
-function GraphicsItem:mouseClickEvent(event)
+    event.target = self
+    return true
 end
 
 function GraphicsItem:mouseReleaseEvent(event)
-    for i = self.childs.__size, 1, -1 do
-        local child = self.childs.__data[i]
-        if child:active_and_enabled() and child:contains(event.x, event.y) then
-            child:mouseReleaseEvent(event)
-            if event.accepted then
-                return
-            end
-        end
-    end
 
-    event:accept(self)
 end
 
 function GraphicsItem:mouseMoveEvent(event)
     for i = self.childs.__size, 1, -1 do
         local child = self.childs.__data[i]
         if child:active_and_enabled() and child:contains(event.x, event.y) then
-            child:mouseMoveEvent(event)
-            if event.accepted then
-                return
+            if child:mouseMoveEvent(event) then
+                return true
             end
         end
     end
+    return false
 end
 
 function GraphicsItem:mouseEnterEvent()
@@ -257,84 +249,84 @@ function GraphicsItem:keyPressEvent(event)
     for i = self.childs.__size, 1, -1 do
         local child = self.childs.__data[i]
         if child:active_and_enabled() then
-            child:keyPressEvent(event)
-            if event.accepted then
-                return
+            if child:keyPressEvent(event) then
+                return true
             end
         end
     end
+    return false
 end
 
 function GraphicsItem:keyReleaseEvent(event)
     for i = self.childs.__size, 1, -1 do
         local child = self.childs.__data[i]
         if child:active_and_enabled() then
-            child:keyReleaseEvent(event)
-            if event.accepted then
-                return
+            if child:keyReleaseEvent(event) then
+                return true
             end
         end
     end
+    return false
 end
 
 function GraphicsItem:inputTextEvent(event)
     for i = self.childs.__size, 1, -1 do
         local child = self.childs.__data[i]
         if child:active_and_enabled() then
-            child:inputTextEvent(event)
-            if event.accepted then
-                return
+            if child:inputTextEvent(event) then
+                return true
             end
         end
     end
+    return false
 end
 
 function GraphicsItem:joystickPressEvent(event)
     for i = self.childs.__size, 1, -1 do
         local child = self.childs.__data[i]
         if child:active_and_enabled() then
-            child:joystickPressEvent(event)
-            if event.accepted then
-                return
+            if child:joystickPressEvent(event) then
+                return true
             end
         end
     end
+    return false
 end
 
 function GraphicsItem:joystickReleaseEvent(event)
     for i = self.childs.__size, 1, -1 do
         local child = self.childs.__data[i]
         if child:active_and_enabled() then
-            child:joystickReleaseEvent(event)
-            if event.accepted then
-                return
+            if child:joystickReleaseEvent(event) then
+                return true
             end
         end
     end
+    return false
 end
 
 function GraphicsItem:joystickAxisEvent(event)
     for i = self.childs.__size, 1, -1 do
         local child = self.childs.__data[i]
         if child:active_and_enabled() then
-            child:joystickAxisEvent(event)
-            if event.accepted then
-                return
+            if child:joystickAxisEvent(event) then
+                return true
             end
         end
     end
+    return false
 end
 
 function GraphicsItem:joystickHatEvent(event)
     for i = self.childs.__size, 1, -1 do
         local child = self.childs.__data[i]
         if child:active_and_enabled() then
-            child:joystickHatEvent(event)
-            if event.accepted then
-                return
+            if child:joystickHatEvent(event) then
+                return true
             end
         end
     end
+    return false
 end
 
 function GraphicsItem:lostFocusEvent()

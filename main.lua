@@ -1,9 +1,11 @@
 package.path = package.path..';src/?.lua'
+package.cpath = package.cpath..';libs/?.so'
 love.filesystem.setRequirePath(package.path)
 
 class = require 'general/class'
 enum = require 'general/enum'
 Self = require 'general/self'
+
 
 debug_enable = true
 

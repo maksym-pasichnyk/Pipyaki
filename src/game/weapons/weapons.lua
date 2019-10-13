@@ -19,7 +19,7 @@ function TileWeapon:new(item, x, y)
     self.item = item
 end
 
-function TileWeapon:placeEvent()
+function TileWeapon:OnCreate(level)
     local explosion = self.item.explosion
 
     if explosion then
@@ -31,14 +31,14 @@ function TileWeapon:placeEvent()
 
             end
 
-            local trace = explosion.trace
-            if trace then
-                local data = trace.sprite
-                local tile = TileSprite(data.texture, Clip(trace, data), data.w, data.h, self.x, self.y, 0, 0, 0)
+            local decal = explosion.decal
+            if decal then
+                local data = decal.sprite
+                local tile = TileSprite(data.texture, Clip(decal, data), data.w, data.h, self.x, self.y, 0, 0, 0)
 
                 self.level:addTile('bottom', tile)
     
-                -- self.timer:after(trace.time, function()
+                -- self.timer:after(decal.time, function()
                     -- self.level:removeTile(tile)
                 -- end)
             end
@@ -50,7 +50,7 @@ function TileWeapon:explosionEvent(data)
     local clips = data.count
     local frames = clips - 1
 
-    local sprite = Sprite:create(data.texture)
+    local sprite = Sprite.create(data.texture)
     for i = 0, frames do
         sprite:add(rect(data.w * i, 0, data.w, data.h))
     end

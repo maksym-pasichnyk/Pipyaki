@@ -8,7 +8,7 @@ end
 
 function startScene(name)
     if scene then
-        scene:exit()
+        scene:leave()
         scene = nil
     end
     
