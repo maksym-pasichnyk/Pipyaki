@@ -20,8 +20,8 @@ local item_table = {
         type = 'tile';
         itemId = 'melon';
         sprite = sprite('weapons/melon.png', 20, 20, 6);
+        delay = 5;
         explosion = {
-            time = 5;
             sprite = sprite('weapons/melon_explosion.png', 60, 60, 11);
             parts = {
                 sprite = sprite('weapons/melon_parts.png', 20, 20, 10);
@@ -35,8 +35,8 @@ local item_table = {
         type = 'tile';
         itemId = 'melon_hard';
         sprite = sprite('weapons/melon_hard.png', 20, 20, 6);
+        delay = 5;
         explosion = {
-            time = 5;
             sprite = sprite('weapons/melon_explosion_hard.png', 60, 60, 11);
             parts = {
                 sprite = sprite('weapons/melon_parts_hard.png', 20, 20, 10);
@@ -51,14 +51,34 @@ local item_table = {
         itemId = 'brick';
     },
     {
-        type = 'tile';
+        type = 'throwable';
         itemId = 'melon_thr';
         sprite = sprite('weapons/melon_thr.png', 20, 20, 6);
+        explosion = {
+            -- time = 0.25;
+            sprite = sprite('weapons/melon_explosion.png', 60, 60, 11);
+            parts = {
+                sprite = sprite('weapons/melon_parts.png', 20, 20, 10);
+            };
+            decal = {
+                sprite = sprite('weapons/melon_crater.png', 35, 35, 3);
+            }
+        };
     },
     {
-        type = 'tile';
+        type = 'throwable';
         itemId = 'melon_thr_hard';
         sprite = sprite('weapons/melon_thr_hard.png', 20, 20, 6);
+        explosion = {
+            -- time = 0.25;
+            sprite = sprite('weapons/melon_explosion_hard.png', 60, 60, 11);
+            parts = {
+                sprite = sprite('weapons/melon_parts_hard.png', 20, 20, 10);
+            };
+            decal = {
+                sprite = sprite('weapons/melon_crater.png', 35, 35, 3);
+            }
+        }
     },
     {
         type = 'item';
@@ -194,7 +214,7 @@ function Inventory:new(scene)
     items = {}
     for i = 0, 25 - 6 do
         local item = Item(self, i + 1, self.icons[i + 6], self.icons[5], item_table[i + 1])
-        item:set(1)
+        item:set(100)
         
         item.x = (i % COLUMNS) * (SIZE + SPACE) + SPACE
         item.y = math.floor(i / COLUMNS) * (SIZE + SPACE) + SPACE

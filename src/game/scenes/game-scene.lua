@@ -191,7 +191,7 @@ end
 
 function GameScene:updateEvent(dt)
     if self.inventory.enabled then
-
+        
     else
         local player = self.player
         if player:isIdle() then
@@ -217,6 +217,8 @@ function GameScene:updateEvent(dt)
                     local data = item.data
                     if data.type == 'tile' then
                         self.level:addTile('middle', TileWeapon(data, self.player.x, self.player.y))
+                    elseif data.type == 'throwable' then
+                        self.level:addTile('middle', Throwable(data, self.player.x, self.player.y, self.player.direction))
                     end
                 end
             end

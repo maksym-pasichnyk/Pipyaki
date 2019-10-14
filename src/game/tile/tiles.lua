@@ -39,7 +39,11 @@ TileTreeCrown = class(TileSprite)
 function TileTreeCrown:new(x, y, properties)
     TileSprite.new(self, 'tree_crowns.png', properties[2] - 1, 105, 92, x * 30, y * 30, 0, -50, 1)
 
-    self.level.update_tiles:add(self)
+    self.level.updates:add(self)
+end
+
+function TileTreeCrown:onDestroy()
+    self.level.updates:remove(self)
 end
 
 function TileTreeCrown:updateEvent(dt)
@@ -271,9 +275,15 @@ function TileItems:new(x, y, properties)
 
     self.itemId = item.itemId
 
-    self.level.update_tiles:add(self)
-
     self.time = love.math.random(math.pi * 2)
+end
+
+function TileItems:onCreate()
+    self.level.updates:add(self)
+end
+
+function TileItems:onDestroy()
+    self.level.updates:remove(self)
 end
 
 function TileItems:updateEvent(dt)

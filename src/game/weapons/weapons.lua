@@ -3,6 +3,7 @@ import 'game/tile/tile-sprite'
 import 'general/math/rect'
 import 'general/graphics/sprite'
 import 'game/inventory'
+import 'general/math/vec2'
 
 local random = love.math.random
 
@@ -19,11 +20,15 @@ function TileWeapon:new(item, x, y)
     self.item = item
 end
 
-function TileWeapon:OnCreate(level)
+function TileWeapon:onCreate(level)
+    self:explode()
+end
+
+function TileWeapon:explode()
     local explosion = self.item.explosion
 
     if explosion then
-        self.timer:after(explosion.time, function()
+        local function start()
             self:explosionEvent(explosion.sprite)
 
             local parts = explosion.parts
@@ -42,6 +47,12 @@ function TileWeapon:OnCreate(level)
                     -- self.level:removeTile(tile)
                 -- end)
             end
+        end
+
+        self.timer:after(self.item.delay or 0, start)
+    else
+        self.timer:after(self.item.delay or 0, function()
+            self.level:removeTile(self)
         end)
     end
 end
@@ -66,4 +77,71 @@ function TileWeapon:explosionEvent(data)
     end, function()
         self.level:removeTile(self)
     end)
+end
+
+Throwable = class(TileWeapon)
+
+local throw_axis = {
+    left  = vec2(-1,  0),
+    right = vec2( 1,  0),
+    up    = vec2( 0, -1),
+    down  = vec2( 0,  1)
+}
+
+local ThrowableState = enum {
+    'Move',
+    'Static'
+}
+
+function Throwable:new(item, x, y, direction)
+    TileWeapon.new(self, item, x, y)
+
+    self.axis = throw_axis[direction]
+    self.power = 300
+end
+
+function Throwable:onCreate(level)
+    self.state = ThrowableState.Move
+
+    local start = vec2(self.x, self.y)
+    local target = start + self.axis * 300
+
+    local tween = self.timer:tween(0.6, start, target)
+    tween.step = function(dt)
+        local tile_x = start.x / 30
+        if self.axis.x < 0 then
+            tile_x = math.floor(tile_x)
+        elseif self.axis.x > 0 then
+            tile_x = math.ceil(tile_x)
+        end
+
+        local tile_y = start.y / 30
+        if self.axis.y < 0 then
+            tile_y = math.floor(tile_y)
+        elseif self.axis.y > 0 then
+            tile_y = math.ceil(tile_y)
+        end
+
+        if self.level:canWalk(tile_x, tile_y) then
+            self.tile_x = tile_x
+            self.tile_y = tile_y
+            self.x = start.x
+            self.y = start.y
+        else
+            self.x = self.tile_x * 30
+            self.y = self.tile_y * 30
+            self.timer:cancel(tween)
+
+            self:explode()
+        end
+    end
+
+    tween.after = function()
+        self:explode()
+    end
+    -- level.updates:add(self)
+end
+
+function Throwable:onDestroy(level)
+    -- level.updates:remove(self)
 end

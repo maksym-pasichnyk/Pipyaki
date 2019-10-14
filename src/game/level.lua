@@ -20,6 +20,7 @@ local function compare_tiles(a, b)
     return a.layer < b.layer
 end
 
+
 Level = class(GraphicsItem)
 function Level:new(scene)
     GraphicsItem.new(self, scene)
@@ -27,12 +28,12 @@ function Level:new(scene)
     self.ignore_self_touches = false
 
     -- todo: make layers as GraphicsItem
-    self.ground = List()
-    self.bottom = List()
-    self.middle = List()
-    self.top = List()
-    self.special = List()
-    self.update_tiles = List()
+    self.ground   = List()
+    self.bottom   = List()
+    self.middle   = List()
+    self.top      = List()
+    self.special  = List()
+    self.updates  = List()
     self.spawners = List()
     self.triggers = List()
 end
@@ -71,7 +72,7 @@ function Level:loadFull()
             for tile_x = 0, width - 1 do
                 for tile_y = 0, height - 1 do
                     if buf[i] ~= 0 then
-                        self.ground:add(TileGrass(buf[i] - 1, tile_x, tile_y))
+                        self:addTile('ground', TileGrass(buf[i] - 1, tile_x, tile_y))
                     end
                     i = i + 1
                 end
@@ -84,7 +85,7 @@ function Level:loadFull()
             for tile_x = 0, width - 1 do
                 for tile_y = 0, height - 1 do
                     if buf[i] ~= 0 then
-                        self.ground:add(TileTrail(buf[i] - 1, tile_x, tile_y))
+                        self:addTile('ground', TileTrail(buf[i] - 1, tile_x, tile_y))
                     end
                     i = i + 1
                 end
@@ -103,14 +104,14 @@ function Level:loadFull()
 
                     if type == 0 then
                         self:addCollision(tile_x, tile_y)
-                        self.middle:add(TileWall(tile_x, tile_y, properties))
+                        self:addTile('middle', TileWall(tile_x, tile_y, properties))
                     elseif type == 1 then
                         self:addCollision(tile_x, tile_y)
-                        self.middle:add(TileWoodWall(tile_x, tile_y, properties))
+                        self:addTile('middle', TileWoodWall(tile_x, tile_y, properties))
                     elseif type == 2 then
                         self:addCollision(tile_x, tile_y)
                         self:addCollision(tile_x + 2, tile_y)
-                        self.middle:add(TileGates(tile_x, tile_y, properties))
+                        self:addTile('middle', TileGates(tile_x, tile_y, properties))
                     elseif type == 3 then
                         self:addCollision(tile_x + 0, tile_y)
                         self:addCollision(tile_x + 1, tile_y)
@@ -121,22 +122,22 @@ function Level:loadFull()
 
                         self:addCollision(tile_x + 0, tile_y + 2)
                         self:addCollision(tile_x + 2, tile_y + 2)
-                        self.middle:add(TileHouseBottom(tile_x, tile_y))
-                        self.top:add(TileHouseTop(tile_x, tile_y))
+                        self:addTile('middle', TileHouseBottom(tile_x, tile_y))
+                        self:addTile('top', TileHouseTop(tile_x, tile_y))
                     elseif type == 4 then
                         self:addCollision(tile_x, tile_y)
-                        self.bottom:add(TileTreeShadow(tile_x, tile_y))
-                        self.middle:add(TileTreeStubs(tile_x, tile_y, properties))
+                        self:addTile('bottom', TileTreeShadow(tile_x, tile_y))
+                        self:addTile('middle', TileTreeStubs(tile_x, tile_y, properties))
                         if properties[2] > 1 then
-                            self.top:add(TileTreeCrown(tile_x, tile_y, properties))
+                            self:addTile('top', TileTreeCrown(tile_x, tile_y, properties))
                         end
                     elseif type == 5 then
                         self:addCollision(tile_x, tile_y)
-                        self.middle:add(TileWell(tile_x, tile_y, properties))
+                        self:addTile('middle', TileWell(tile_x, tile_y, properties))
                     elseif type == 6 then
-                        -- self.middle:add(TileTent(tile_x, tile_y, properties))
+                        -- self:addTile('middle', TileTent(tile_x, tile_y, properties))
                     elseif type == 7 then
-                        -- self.middle:add(TileChest(tile_x, tile_y, properties))
+                        -- self:addTile('middle', TileChest(tile_x, tile_y, properties))
                     end
                 end
             end
@@ -153,21 +154,21 @@ function Level:loadFull()
                 local tile_y = math.floor(y / 30)
 
                 if type == 0 then
-                    self.bottom:add(TileStones20(x, y, subtype))
+                    self:addTile('bottom', TileStones20(x, y, subtype))
                 elseif type == 1 then
-                    self.bottom:add(TileStones30(x, y, subtype))
+                    self:addTile('bottom', TileStones30(x, y, subtype))
                 elseif type == 2 then
-                    self.middle:add(TileBushesBig(x, y, subtype))
+                    self:addTile('middle', TileBushesBig(x, y, subtype))
                 elseif type == 3 then
                     self:addCollision(tile_x, tile_y)
-                    self.middle:add(TileBushesBananas(x, y, subtype))
+                    self:addTile('middle', TileBushesBananas(x, y, subtype))
                 elseif type == 4 then
                     self:addCollision(tile_x, tile_y)
-                    self.middle:add(TileTelegaBricks(x, y, subtype))
+                    self:addTile('middle', TileTelegaBricks(x, y, subtype))
                 elseif type == 5 then
-                    self.middle:add(TileRidge(x, y, subtype))
+                    self:addTile('middle', TileRidge(x, y, subtype))
                 elseif type == 6 then
-                    self.bottom:add(TileCactusesSmall(x, y, subtype))
+                    self:addTile('bottom', TileCactusesSmall(x, y, subtype))
                 end
             end
         end;
@@ -186,21 +187,21 @@ function Level:loadFull()
                 end
 
                 if type == 0 then
-                    self.spawners:add(TileSpawnPoint(tile_x, tile_y, properties))
+                    self:addTile('spawners', TileSpawnPoint(tile_x, tile_y, properties))
                 elseif type == 1 then
-                    self.special:add(TileStaticWeapon(tile_x, tile_y, properties))
+                    self:addTile('special', TileStaticWeapon(tile_x, tile_y, properties))
                 elseif type == 2 then
-                    self.middle:add(TileTrampoline(tile_x, tile_y, properties))
+                    self:addTile('middle', TileTrampoline(tile_x, tile_y, properties))
                 elseif type == 3 then
-                    self.special:add(TileItems(tile_x, tile_y, properties))
+                    self:addTile('special', TileItems(tile_x, tile_y, properties))
                 elseif type == 4 then
-                    self.special:add(TileFlagBlue(tile_x, tile_y))
+                    self:addTile('special', TileFlagBlue(tile_x, tile_y))
                 elseif type == 5 then
-                    self.special:add(TileFlagRed(tile_x, tile_y))
+                    self:addTile('special', TileFlagRed(tile_x, tile_y))
                 elseif type == 6 then
-                    -- self.special:add(TileDeathZone(tile_x, tile_y))
+                    -- self:addTile('special', TileDeathZone(tile_x, tile_y))
                 elseif type == 7 then
-                    self.triggers:add(TileTrigger(tile_x, tile_y, properties))
+                    self:addTile('triggers', TileTrigger(tile_x, tile_y, properties))
                 elseif type == 8 then
                     -- self.triggers:add(TileParticle(tile_x, tile_y, properties))
                 end
@@ -223,7 +224,7 @@ function Level:load(path)
     self.middle:clear()
     self.top:clear()
     self.special:clear()
-    self.update_tiles:clear()
+    self.updates:clear()
     self.spawners:clear()
     self.triggers:clear()
 
@@ -302,25 +303,26 @@ function Level:paintEvent()
     self.parent.camera:afterRenderEvent()
 end
 
+function Level:addTile(layer_name, tile)
+    assert(rawequal(tile.level_layer, nil))
+
+    local layer = self[layer_name]
+    tile.level_layer = layer
+    layer:add(tile)
+    layer:stable_sort(compare_tiles)
+    
+    invoke(tile, 'onCreate', self)
+end
+
 function Level:removeTile(tile)
-    invoke(tile, 'OnDestroy', self)
+    invoke(tile, 'onDestroy', self)
 
     tile.level_layer:remove(tile)
     tile.level_layer = nil
 end
 
-function Level:addTile(layer_name, tile)
-    local layer = self[layer_name]
-
-    tile.level_layer = layer
-    layer:add(tile)
-    layer:stable_sort(compare_tiles)
-    
-    invoke(tile, 'OnCreate', self)
-end
-
 function Level:updateEvent(dt)
-    self.update_tiles:foreach(Self.updateEvent, dt)
+    self.updates:foreach(Self.updateEvent, dt)
 
     local it = self.special:find(function(tile, player)
         local dx = math.abs(tile.x - player.x)
@@ -333,7 +335,7 @@ function Level:updateEvent(dt)
 
         if tile:is(TileItems) then
             self.parent:pickup(tile)
-            self.special:remove(tile)
+            self:removeTile('special', tile)
         end
     end
 end
