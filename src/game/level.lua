@@ -335,7 +335,7 @@ function Level:updateEvent(dt)
 
         if tile:is(TileItems) then
             self.parent:pickup(tile)
-            self:removeTile('special', tile)
+            self:removeTile(tile)
         end
     end
 end

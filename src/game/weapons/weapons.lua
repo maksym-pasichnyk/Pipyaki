@@ -15,7 +15,7 @@ TileWeapon = class(TileSprite)
 function TileWeapon:new(item, x, y)
     local data = item.sprite
 
-    TileSprite.new(self, data.texture, Clip(item, data), data.w, data.h, x, y, 0, 0, 0)
+    TileSprite.new(self, data.texture, Clip(item, data), data.w, data.h, x, y, 0, 0, 1)
 
     self.item = item
 end
@@ -98,41 +98,87 @@ function Throwable:new(item, x, y, direction)
 
     self.axis = throw_axis[direction]
     self.power = 300
+    self.collision = item.collision or 'default'
 end
 
 function Throwable:onCreate(level)
     self.state = ThrowableState.Move
+    local collision = self.collision
 
     local start = vec2(self.x, self.y)
     local target = start + self.axis * 300
 
     local tween = self.timer:tween(0.6, start, target)
-    tween.step = function(dt)
-        local tile_x = start.x / 30
-        if self.axis.x < 0 then
-            tile_x = math.floor(tile_x)
-        elseif self.axis.x > 0 then
-            tile_x = math.ceil(tile_x)
+    if collision == 'inside' then
+        local inside = false
+        local target_x = 0
+        local target_y = 0
+        tween.step = function(dt)
+            local tile_x = start.x / 30
+            if self.axis.x < 0 then
+                tile_x = math.floor(tile_x)
+            elseif self.axis.x > 0 then
+                tile_x = math.ceil(tile_x)
+            end
+
+            local tile_y = start.y / 30
+            if self.axis.y < 0 then
+                tile_y = math.floor(tile_y)
+            elseif self.axis.y > 0 then
+                tile_y = math.ceil(tile_y)
+            end
+
+
+            if inside then
+                if tile_x == target_x and tile_y == target_y then
+                    self.tile_x = tile_x
+                    self.tile_y = tile_y
+                    self.x = tile_x * 30
+                    self.y = tile_y * 30
+                    self.timer:cancel(tween)
+    
+                    self:explode()
+                end
+            else
+                inside = not self.level:canWalk(tile_x, tile_y)
+                if inside then
+                    target_x = tile_x
+                    target_y = tile_y
+                end
+                self.tile_x = tile_x
+                self.tile_y = tile_y
+                self.x = start.x
+                self.y = start.y
+            end
         end
+    else
+        tween.step = function(dt)
+            local tile_x = start.x / 30
+            if self.axis.x < 0 then
+                tile_x = math.floor(tile_x)
+            elseif self.axis.x > 0 then
+                tile_x = math.ceil(tile_x)
+            end
 
-        local tile_y = start.y / 30
-        if self.axis.y < 0 then
-            tile_y = math.floor(tile_y)
-        elseif self.axis.y > 0 then
-            tile_y = math.ceil(tile_y)
-        end
+            local tile_y = start.y / 30
+            if self.axis.y < 0 then
+                tile_y = math.floor(tile_y)
+            elseif self.axis.y > 0 then
+                tile_y = math.ceil(tile_y)
+            end
 
-        if self.level:canWalk(tile_x, tile_y) then
-            self.tile_x = tile_x
-            self.tile_y = tile_y
-            self.x = start.x
-            self.y = start.y
-        else
-            self.x = self.tile_x * 30
-            self.y = self.tile_y * 30
-            self.timer:cancel(tween)
+            if self.level:canWalk(tile_x, tile_y) then
+                self.tile_x = tile_x
+                self.tile_y = tile_y
+                self.x = start.x
+                self.y = start.y
+            else
+                self.x = self.tile_x * 30
+                self.y = self.tile_y * 30
+                self.timer:cancel(tween)
 
-            self:explode()
+                self:explode()
+            end
         end
     end
 

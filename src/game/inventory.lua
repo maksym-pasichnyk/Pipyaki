@@ -47,15 +47,25 @@ local item_table = {
         }
     },
     {
-        type = 'item';
+        type = 'throwable';
         itemId = 'brick';
+        sprite = sprite('weapons/brick.png', 20, 17, 6);
+        collision = 'inside';
+        explosion = {
+            sprite = sprite('weapons/brick_explosion.png', 45, 45, 12);
+            -- parts = {
+            --     sprite = sprite('weapons/melon_parts.png', 20, 20, 10);
+            -- };
+            -- decal = {
+            --     sprite = sprite('weapons/melon_crater.png', 35, 35, 3);
+            -- }
+        }
     },
     {
         type = 'throwable';
         itemId = 'melon_thr';
         sprite = sprite('weapons/melon_thr.png', 20, 20, 6);
         explosion = {
-            -- time = 0.25;
             sprite = sprite('weapons/melon_explosion.png', 60, 60, 11);
             parts = {
                 sprite = sprite('weapons/melon_parts.png', 20, 20, 10);
@@ -63,7 +73,7 @@ local item_table = {
             decal = {
                 sprite = sprite('weapons/melon_crater.png', 35, 35, 3);
             }
-        };
+        }
     },
     {
         type = 'throwable';
@@ -89,12 +99,26 @@ local item_table = {
         itemId = 'melon_2_hard';
     },
     {
-        type = 'item';
+        type = 'throwable';
         itemId = 'ananas';
+        sprite = sprite('weapons/ananas.png', 40, 40, 1);
+        explosion = {
+            sprite = sprite('weapons/ananas_exploding.png', 60, 60, 6);
+            parts = {
+                sprite = sprite('weapons/ananas_parts.png', 26, 26, 7);
+            }
+        }
     },
     {
-        type = 'item';
+        type = 'throwable';
         itemId = 'ananas_hard';
+        sprite = sprite('weapons/ananas_hard.png', 40, 40, 1);
+        explosion = {
+            sprite = sprite('weapons/ananas_exploding_hard.png', 60, 60, 6);
+            parts = {
+                sprite = sprite('weapons/ananas_parts_hard.png', 26, 26, 7);
+            }
+        }
     },
     {
         type = 'item';
