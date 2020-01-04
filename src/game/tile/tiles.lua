@@ -208,17 +208,55 @@ end
 
 TileTrampoline = class(TileSprite)
 TrampolineDirection = enum {
-    'Down',
-    'Left',
-    'Up',
-    'Right'
+    'down',
+    'left',
+    'up',
+    'right'
+}
+local trampoline_directions = {
+    { x =  0, y =  1 },
+    { x = -1, y =  0 },
+    { x =  0, y = -1 },
+    { x =  1, y =  0 }
+}
+local trampoline_directions_name = {
+    'down',
+    'left',
+    'up',
+    'right'
 }
 
 function TileTrampoline:new(x, y, properties)
     TileSprite.new(self, 'trampoline.png', 0, 40, 35, x * 30, y * 30, 0, -1)
 
-    self.direction = properties[1]
-    self.distance = properties[2]
+    local direction = properties[1] + 1
+    local distance = properties[2]
+    local offset = trampoline_directions[direction]
+
+    self.direction = trampoline_directions_name[direction]
+    self.distance = distance
+    self.offset = {
+        x = offset.x * distance,
+        y = offset.y * distance
+    }
+end
+
+function TileTrampoline:render()
+    TileSprite.render(self)
+
+    if debug_enable then
+        love.graphics.setColor({0, 0.1, 1})
+
+        local tx = self.x + self.offset.x * 30
+        local ty = self.y + self.offset.y * 30
+
+        if self.x ~= tx or self.y ~= ty then
+            love.graphics.circle('line', self.x, self.y, 15 + 10)
+            love.graphics.line(self.x, self.y, tx, ty)
+            love.graphics.circle('line', tx, ty, 15 + 10)
+        end
+        love.graphics.setColor({1, 1, 1})
+    end
 end
 
 TileItems = class(TileSprite)

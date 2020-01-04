@@ -90,7 +90,7 @@ function GameScene:enter()
     self.default_item:set(100)
     self.inventory:selectSlot(self.default_item.slot)
 
-    self:startLevel(1)
+    self:startLevel(18)
 
     self.inventory.enabled = false
     self:resetCamera()

@@ -135,6 +135,52 @@ function Entity:move(direction, walk)
     end
 end
 
+function Entity:execute(tile)
+    -- if self.state == EntityState.Move then
+    --     return
+    -- end
+
+    self.isExecuting = true
+
+    self.timer:clear()
+
+    self.x = self.tile_x * 30
+    self.y = self.tile_y * 30
+
+    self.state = EntityState.Move
+    if tile:is(TileTrampoline) then
+        -- if tile.distance == 0 then
+        --     return
+        -- end
+
+        self.clip = self.anims[tile.direction].idle + 1
+        local offset = tile.offset
+        local time = tile.distance / 15
+
+        self.isExecuting = true
+
+        self.state = EntityState.Move
+        local tween = self.timer:tween(time, self, {
+            x = self.x + offset.x * 30,
+            y = self.y + offset.y * 30
+        })
+
+        self.tile_x = self.tile_x + offset.x
+        self.tile_y = self.tile_y + offset.y
+
+        tween.after = function()
+            self.isExecuting = false
+            self.state = EntityState.Idle
+        end
+    end
+end
+
+function Entity:try_execute(tile)
+    if not self.isExecuting then
+        self:execute(tile)
+    end
+end
+
 function Entity:try_move(direction)
     if self.state == EntityState.Move then
         return false

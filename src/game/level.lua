@@ -324,11 +324,17 @@ end
 function Level:updateEvent(dt)
     self.updates:foreach(Self.updateEvent, dt)
 
+    local player = self.parent.player
+
+    if player.isExecuting then
+        return
+    end
+
     local it = self.special:find(function(tile, player)
         local dx = math.abs(tile.x - player.x)
         local dy = math.abs(tile.y - player.y)
         return dx < 5 and dy < 5
-    end, self.parent.player)
+    end, player)
 
     if it then
         local tile = it.value
@@ -337,5 +343,20 @@ function Level:updateEvent(dt)
             self.parent:pickup(tile)
             self:removeTile(tile)
         end
+        return
+    end
+
+    it = self.middle:find(function(tile, player)
+        if tile:is(TileTrampoline) then
+            local dx = math.abs(tile.x - player.x)
+            local dy = math.abs(tile.y - player.y)
+            return dx < 5 and dy < 5
+        end
+        return false
+    end, player)
+
+    if it then
+        player:execute(it.value)
+        return
     end
 end
