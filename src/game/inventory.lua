@@ -53,12 +53,6 @@ local item_table = {
         collision = 'inside';
         explosion = {
             sprite = sprite('weapons/brick_explosion.png', 45, 45, 12);
-            -- parts = {
-            --     sprite = sprite('weapons/melon_parts.png', 20, 20, 10);
-            -- };
-            -- decal = {
-            --     sprite = sprite('weapons/melon_crater.png', 35, 35, 3);
-            -- }
         }
     },
     {
@@ -133,8 +127,19 @@ local item_table = {
         itemId = 'grabli';
     },
     {
-        type = 'item';
+        type = 'tile';
         itemId = 'bomb';
+        sprite = sprite('weapons/bomb.png', 30, 30, 4);
+        delay = 5;
+        explosion = {
+            sprite = sprite('weapons/bomb_explosion.png', 60, 60, 9);
+            parts = {
+                sprite = sprite('weapons/bomb_parts_hard.png', 22, 22, 8);
+            };
+            decal = {
+                sprite = sprite('weapons/bomb_crater.png', 40, 40, 2);
+            }
+        }
     },
     {
         type = 'tile';
