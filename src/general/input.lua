@@ -183,19 +183,23 @@ function Input.mousemoved(x, y, dx, dy)
 end
 
 function Input.keypressed(key, scancode, isrepeat)
-    table.insert(queue, {
-        type = KEY_PRESSED,
-        key = key,
-        code = scancode,
-        isrepeat = isrepeat
-    })
+    if key ~= 'unknown' then
+        table.insert(queue, {
+            type = KEY_PRESSED,
+            key = key,
+            code = scancode,
+            isrepeat = isrepeat
+        })
+    end
 end
 
 function Input.keyreleased(key)
-    table.insert(queue, {
-        type = KEY_RELEASED,
-        key = key
-    })
+    if key ~= 'unknown' then
+        table.insert(queue, {
+            type = KEY_RELEASED,
+            key = key
+        })
+    end
 end
 
 function Input.textinput(text)
