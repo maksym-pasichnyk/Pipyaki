@@ -188,6 +188,6 @@ function Throwable:onCreate(level)
     -- level.updates:add(self)
 end
 
-function Throwable:onDestroy(level)
+function Throwable:onRemove(level)
     -- level.updates:remove(self)
 end

@@ -315,7 +315,7 @@ function Level:addTile(layer_name, tile)
 end
 
 function Level:removeTile(tile)
-    invoke(tile, 'onDestroy', self)
+    invoke(tile, 'onRemove', self)
 
     tile.level_layer:remove(tile)
     tile.level_layer = nil

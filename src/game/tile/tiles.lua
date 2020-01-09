@@ -42,7 +42,7 @@ function TileTreeCrown:new(x, y, properties)
     self.level.updates:add(self)
 end
 
-function TileTreeCrown:onDestroy()
+function TileTreeCrown:onRemove()
     self.level.updates:remove(self)
 end
 
@@ -320,7 +320,7 @@ function TileItems:onCreate()
     self.level.updates:add(self)
 end
 
-function TileItems:onDestroy()
+function TileItems:onRemove()
     self.level.updates:remove(self)
 end
 
