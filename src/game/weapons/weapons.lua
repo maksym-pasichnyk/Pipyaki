@@ -13,7 +13,7 @@ end
 
 TileWeapon = class(TileSprite)
 function TileWeapon:new(item, x, y)
-    local data = item.sprite
+    local data = item.sprite_data
 
     TileSprite.new(self, data.texture, Clip(item, data), data.w, data.h, x, y, 0, 0, 1)
 
@@ -21,15 +21,15 @@ function TileWeapon:new(item, x, y)
 end
 
 function TileWeapon:onCreate(level)
-    self:explode()
+    self:destroy()
 end
 
-function TileWeapon:explode()
+function TileWeapon:destroy()
     local explosion = self.item.explosion
 
     if explosion then
         local function start()
-            self:explosionEvent(explosion.sprite)
+            self:explosionEvent(explosion.sprite_data)
 
             local parts = explosion.parts
             if parts then
@@ -38,7 +38,7 @@ function TileWeapon:explode()
 
             local decal = explosion.decal
             if decal then
-                local data = decal.sprite
+                local data = decal.sprite_data
                 local tile = TileSprite(data.texture, Clip(decal, data), data.w, data.h, self.x, self.y, 0, 0, 0)
 
                 self.level:addTile('bottom', tile)
@@ -128,7 +128,6 @@ function Throwable:onCreate(level)
                 tile_y = math.ceil(tile_y)
             end
 
-
             if inside then
                 if tile_x == target_x and tile_y == target_y then
                     self.tile_x = tile_x
@@ -137,7 +136,7 @@ function Throwable:onCreate(level)
                     self.y = tile_y * 30
                     self.timer:cancel(tween)
     
-                    self:explode()
+                    self:destroy()
                 end
             else
                 inside = not self.level:canWalk(tile_x, tile_y)
@@ -177,13 +176,13 @@ function Throwable:onCreate(level)
                 self.y = self.tile_y * 30
                 self.timer:cancel(tween)
 
-                self:explode()
+                self:destroy()
             end
         end
     end
 
     tween.after = function()
-        self:explode()
+        self:destroy()
     end
     -- level.updates:add(self)
 end

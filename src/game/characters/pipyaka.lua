@@ -1,8 +1,13 @@
 import 'game/entity/entity'
+import 'game/inventory'
+import 'game/weapons/weapons'
 
 Pipyaka = class(Entity)
-function Pipyaka:new(tile_x, tile_y)
-    Entity.new(self, 'chars/pipyaka.png', tile_x, tile_y, 32, 30, 30)
+function Pipyaka:init()
+    Entity.init(self, 'chars/pipyaka.png', 32, 30, 30)
+
+    self.rotation_speed = 20
+    self.movement_speed = 2
 
     self.anims = {
         down   = make_anim(0, 12, 5, 10),

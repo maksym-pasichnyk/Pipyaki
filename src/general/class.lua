@@ -1,13 +1,12 @@
 local Class = {
     __call = function(self, ...)
         local this = setmetatable({}, self)
-        local new = this.new
+        local new = self.new
         if new then
             new(this, ...)
         end
         return this
     end;
-
     __is = function(self, T)
         local t = self
 

@@ -1,8 +1,8 @@
 import 'game/entity/entity'
 
-Bombaka = class(Entity)
-function Bombaka:init()
-    Entity.init(self, 'chars/bombaka.png', 32, 30, 30)
+Slonyaka = class(Entity)
+function Slonyaka:init()
+    Entity.init(self, 'chars/slonyaka.png', 32, 80, 80)
 
     self.rotation_speed = 20
     self.movement_speed = 2

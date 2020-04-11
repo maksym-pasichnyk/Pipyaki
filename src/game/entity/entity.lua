@@ -3,21 +3,18 @@ import 'general/math/rect'
 import 'general/graphics/sprite'
 import 'general/scene/scene-manager'
 
-function make_anim(idle, index, frames, speed)
-    return { idle = idle, index = index, frames = frames, speed = speed }
-end
-
-Entity = class(Tile)
 EntityState = enum {
     'Idle',
     'Move',
 }
 
-function Entity:new(path, tile_x, tile_y, clips, rw, rh, anims)
-    Tile.new(self, 0, 0, 0, 0, 2)
+function make_anim(idle, index, frames, speed)
+    return { idle = idle, index = index, frames = frames, speed = speed }
+end
 
-    self.sprite = Sprite.create(path)
-    self.anims = anims or {}
+Entity = class(Tile)
+function Entity:new(tile_x, tile_y)
+    Tile.new(self, 0, 0, 0, 0, 2)
 
     self.tile_x = tile_x
     self.tile_y = tile_y
@@ -36,6 +33,11 @@ function Entity:new(path, tile_x, tile_y, clips, rw, rh, anims)
     self.direction = 'down'
 
     self.state = EntityState.Idle
+end
+
+function Entity:init(path, clips, rw, rh, anims)
+    self.sprite = Sprite.create(path)
+    self.anims = anims or {}
 
     for i = 0, clips - 1 do
         self.sprite:add(rect(rw * i, 0, rw, rh))
@@ -43,7 +45,13 @@ function Entity:new(path, tile_x, tile_y, clips, rw, rh, anims)
 end
 
 function Entity:render()
-    Sprite.render(self.sprite:get(self.clip), self.x, self.y)
+    if not (self.helmet and self.helmet.hide_player) then
+        Sprite.render(self.sprite:get(self.clip), self.x, self.y)
+    end
+
+    if self.helmet then
+        self.helmet:render(self)
+    end
 end
 
 function Entity:boundingRect()
@@ -89,14 +97,17 @@ function Entity:move(direction, walk)
         end
 
         self.time = 0
-        local duration = math.abs(frames) / 60
+        local duration = math.abs(frames) / self.rotation_speed
         self.timer:during(duration, function(dt)
             local c = func(clip + frames * math.min(self.time / duration, 1))
             self.clip = math.clamp(c - math.floor(c / 12) * 12, 0, 11) + 1
             self.time = self.time + dt
+
+            self.dir_clip = self.clip
         end, function()
             self.clip = anim.idle + 1
             self.state = EntityState.Idle
+            self.dir_clip = self.clip
         end)
     elseif walk then
         local anim = self.anims[direction]
@@ -121,7 +132,7 @@ function Entity:move(direction, walk)
         local frames = anim.frames
         local speed = anim.speed
 
-        local tween = self.timer:tween(0.6, self, target)        
+        local tween = self.timer:tween(1 / self.movement_speed, self, target)        
 
         tween.step = function(dt)
             self.clip = clip + math.floor(self.time) % frames + 1
@@ -188,6 +199,6 @@ function Entity:isIdle()
     return self.state == EntityState.Idle
 end
 
-function Entity:tile()
-    return self.tile_x, self.tile_y
+function Entity:setHelmet(helmet)
+    self.helmet = helmet
 end
