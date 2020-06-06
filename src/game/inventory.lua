@@ -208,7 +208,7 @@ local item_table = {
     'bananas_skin',
     'grabli',
     'bomb',
-    'mine', --sprite_data = sprite('weapons/mine.png', 16, 14, 1);
+    'mine',
     'bananas',
     'helmet',
     'invisible_helmet',
